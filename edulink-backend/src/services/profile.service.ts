@@ -68,10 +68,19 @@ export const upsertOwnProfile = async (
     }
 
     if (interests.length > 0) {
+      const { data: matchedInterests, error: fetchError } = await supabase
+        .from("interests")
+        .select("id")
+        .in("name", interests);
+
+      if (fetchError || !matchedInterests) {
+        throw appError("Failed to resolve interest IDs");
+      }
+
       const { error: insertError } = await supabase.from("profile_interests").insert(
-        interests.map((interestId) => ({
+        matchedInterests.map((interest) => ({
           profile_id: userId,
-          interest_id: interestId,
+          interest_id: interest.id,
         }))
       );
 

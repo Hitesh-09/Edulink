@@ -5,16 +5,17 @@ import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { apiFetch } from '@/lib/api';
 
 const AVAILABLE_INTERESTS = [
-  'DSA', 'Web Dev', 'AI/ML', 'Cybersecurity', 
+  'DSA', 'Web Dev', 'AI/ML', 'Cybersecurity',
   'Mobile Dev', 'DevOps', 'Data Science', 'UI/UX'
 ];
 
 export default function ProfileSetupPage() {
   const router = useRouter();
   const supabase = createClientComponentClient();
-  
+
   const [step, setStep] = useState<1 | 2>(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,30 +56,18 @@ export default function ProfileSetupPage() {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
-      const payload = {
-        fullName,
-        college,
-        degree,
-        branch,
-        year,
-        interests,
-      };
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const response = await fetch(`${API_URL}/api/profile`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(session && { Authorization: `Bearer ${session.access_token}` }),
-        },
-        body: JSON.stringify(payload),
+      await apiFetch('/api/profile', {
+        method: 'PUT',
+        body: JSON.stringify({
+          full_name: fullName,
+          college: college,
+          degree: degree,
+          branch: branch,
+          year: parseInt(year),
+          interests: interests
+        }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || 'Failed to complete profile.');
-      }
 
       router.push('/dashboard');
     } catch (err: any) {
@@ -91,23 +80,23 @@ export default function ProfileSetupPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-2xl bg-surface p-6 sm:p-10 rounded-2xl shadow-sm border border-border">
-        
+
         {/* Progress Indicator */}
         <div className="mb-10">
           <div className="flex items-center justify-between relative">
             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 rounded-full z-0"></div>
-            <div 
-              className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary rounded-full z-0 transition-all duration-500 ease-in-out" 
+            <div
+              className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary rounded-full z-0 transition-all duration-500 ease-in-out"
               style={{ width: step === 1 ? '50%' : '100%' }}
             ></div>
-            
+
             <div className={`relative z-10 flex flex-col items-center ${step >= 1 ? 'text-primary' : 'text-gray-400'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold mb-2 transition-colors duration-300 ${step >= 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'}`}>
                 1
               </div>
               <span className="text-xs font-semibold uppercase tracking-wide">Academic Info</span>
             </div>
-            
+
             <div className={`relative z-10 flex flex-col items-center ${step === 2 ? 'text-primary' : 'text-gray-400'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold mb-2 transition-colors duration-300 ${step === 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'}`}>
                 2
@@ -162,7 +151,7 @@ export default function ProfileSetupPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-gray-700">Degree</label>
-                <select 
+                <select
                   className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                   value={degree}
                   onChange={(e) => setDegree(e.target.value)}
@@ -178,7 +167,7 @@ export default function ProfileSetupPage() {
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-gray-700">Year</label>
-                <select 
+                <select
                   className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
@@ -212,11 +201,10 @@ export default function ProfileSetupPage() {
                   <button
                     key={interest}
                     onClick={() => toggleInterest(interest)}
-                    className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors border flex items-center justify-center text-center ${
-                      isSelected 
-                        ? 'bg-purple-100 text-purple-700 border-purple-200 shadow-inner' 
+                    className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors border flex items-center justify-center text-center ${isSelected
+                        ? 'bg-purple-100 text-purple-700 border-purple-200 shadow-inner'
                         : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     {interest}
                   </button>
