@@ -51,9 +51,9 @@ export function StudentCard({ profile, connectionStatus, onConnect }: StudentCar
         </div>
         
         <div className="flex flex-wrap gap-1.5">
-          {displayedInterests.map((interest, idx) => (
+          {displayedInterests.map((interest: any, idx) => (
             <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200">
-              {interest}
+              {interest.name || interest}
             </span>
           ))}
           {extraInterests > 0 && (

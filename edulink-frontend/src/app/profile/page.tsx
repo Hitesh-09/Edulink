@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/Button';
@@ -17,6 +18,8 @@ const AVAILABLE_INTERESTS = [
 ];
 
 export default function ProfilePage() {
+  const { id } = useParams();
+  const router = useRouter();
   const supabase = createClientComponentClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -25,16 +28,18 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [profile, setProfile] = useState<any>(null);
   const [insights, setInsights] = useState<any>(null);
   const [formData, setFormData] = useState<any>({
-    full_name: '',
+    fullName: '',
     college: '',
     degree: 'B.Tech',
     branch: '',
     year: 1,
-    interests: [] as string[]
+    interests: [] as string[],
+    avatarUrl: ''
   });
 
   const fetchData = async () => {
@@ -48,7 +53,10 @@ export default function ProfilePage() {
         apiFetch<any>('/api/insights')
       ]);
 
-      setProfile(profileData);
+      // Safely extract profile data (sometimes backend returns an array or nested object)
+      const actualProfile = Array.isArray(profileData) ? profileData[0] : (profileData?.profile || profileData);
+      
+      setProfile(actualProfile);
       setInsights(insightsData || {
         totalSessions: 0,
         connectionsCount: 0,
@@ -56,12 +64,13 @@ export default function ProfilePage() {
       });
       
       setFormData({
-        full_name: profileData.full_name || '',
-        college: profileData.college || '',
-        degree: profileData.degree || 'B.Tech',
-        branch: profileData.branch || '',
-        year: profileData.year || 1,
-        interests: (profileData.interests || []).map((i: any) => i.name || i)
+        fullName: actualProfile?.full_name || actualProfile?.fullName || '',
+        college: actualProfile?.college || actualProfile?.college || 'SRM Institute of Science and Technology',
+        degree: actualProfile?.degree || 'B.Tech',
+        branch: actualProfile?.branch || '',
+        year: actualProfile?.year || 1,
+        interests: (actualProfile?.interests || []).map((i: any) => i.name || i),
+        avatarUrl: actualProfile?.avatar_url || actualProfile?.avatarUrl || ''
       });
     } catch (error) {
       console.error('Error fetching profile data:', error);
@@ -77,12 +86,44 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     setIsSaving(true);
+    
+    // Safely extract profile data just in case the backend nested it (e.g., { profile: {...}, interests: [...] })
+    const pData = profile?.profile || profile || {};
     try {
+      setError(null);
+      const payload = {
+        full_name: formData.fullName || pData.full_name || pData.fullName,
+        college: formData.college || pData.college,
+        degree: formData.degree || pData.degree,
+        branch: formData.branch || pData.branch,
+        year: Number(formData.year) || Number(pData.year) || 1,
+        interests: formData.interests?.length > 0 ? formData.interests : pData.interests || [],
+        avatar_url: formData.avatarUrl || pData.avatar_url || pData.avatarUrl
+      };
+
+      // 🛑 PRE-FLIGHT CHECK: Specific field validation
+      const missingFields = [];
+      if (!payload.full_name) missingFields.push("Full Name");
+      if (!payload.college) missingFields.push("College");
+      if (!payload.degree) missingFields.push("Degree");
+      if (!payload.branch) missingFields.push("Branch");
+      if (!payload.year) missingFields.push("Year");
+
+      if (missingFields.length > 0) {
+        const errorMsg = `Required fields missing: ${missingFields.join(", ")}`;
+        setError(errorMsg);
+        setToastMessage("Please fill in all required fields.");
+        console.error("❌ ABORTING:", errorMsg, payload);
+        setIsSaving(false);
+        return; 
+      }
+
       await apiFetch('/api/profile', {
         method: 'PUT',
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
-      setProfile({ ...profile, ...formData });
+
+      setProfile({ ...profile, ...payload });
       setIsEditing(false);
       setToastMessage('Profile updated successfully!');
     } catch (error) {
@@ -124,10 +165,19 @@ export default function ProfilePage() {
       // Update profile with new avatar URL
       await apiFetch('/api/profile', {
         method: 'PUT',
-        body: JSON.stringify({ ...formData, avatar_url: publicUrl })
+        body: JSON.stringify({
+          full_name: formData.fullName,
+          college: formData.college,
+          degree: formData.degree,
+          branch: formData.branch,
+          year: parseInt(formData.year, 10),
+          interests: formData.interests,
+          avatar_url: publicUrl
+        })
       });
 
-      setProfile({ ...profile, avatar_url: publicUrl });
+      setFormData((prev: any) => ({ ...prev, avatarUrl: publicUrl }));
+      setProfile((prev: any) => ({ ...prev, avatar_url: publicUrl }));
       setToastMessage('Avatar updated successfully!');
     } catch (error) {
       console.error('Error uploading avatar:', error);
@@ -144,6 +194,12 @@ export default function ProfilePage() {
         ? prev.interests.filter((i: string) => i !== interest)
         : [...prev.interests, interest]
     }));
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/auth');
+    router.refresh();
   };
 
   if (isLoading) {
@@ -168,6 +224,16 @@ export default function ProfilePage() {
   return (
     <AppLayout>
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
+      
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-2">
+            <span>⚠️</span>
+            {error}
+          </div>
+          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">✕</button>
+        </div>
+      )}
       
       {/* Profile Header */}
       <div className="bg-surface rounded-2xl border border-border p-8 mb-8 shadow-sm">
@@ -205,9 +271,14 @@ export default function ProfilePage() {
                   {profile?.degree} • {profile?.branch} • Year {profile?.year}
                 </p>
               </div>
-              <div className="flex justify-center md:justify-end">
+              <div className="flex justify-center md:justify-end gap-3">
                 {!isEditing ? (
-                  <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+                  <>
+                    <Button variant="secondary" className="text-red-600 border-red-200 hover:bg-red-50" onClick={handleSignOut}>
+                      Sign Out
+                    </Button>
+                    <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+                  </>
                 ) : (
                   <div className="flex gap-3">
                     <Button variant="secondary" onClick={() => setIsEditing(false)} disabled={isSaving}>Cancel</Button>
@@ -254,6 +325,11 @@ export default function ProfilePage() {
               </div>
             ) : (
               <div className="space-y-4">
+                <Input 
+                  label="Full Name" 
+                  value={formData.fullName} 
+                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                />
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium text-gray-700">Degree</label>
@@ -281,16 +357,33 @@ export default function ProfilePage() {
                     </select>
                   </div>
                 </div>
-                <Input 
-                  label="Branch" 
-                  value={formData.branch} 
-                  onChange={(e) => setFormData({...formData, branch: e.target.value})}
-                />
-                <Input 
-                  label="College" 
-                  value={formData.college} 
-                  onChange={(e) => setFormData({...formData, college: e.target.value})}
-                />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-gray-700">Branch</label>
+                  <select
+                    value={formData.branch}
+                    onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
+                  >
+                    <option value="" disabled>Select your branch</option>
+                    <option value="CSE Core">CSE Core</option>
+                    <option value="CSE AIML">CSE AIML</option>
+                    <option value="CSE Software">CSE Software</option>
+                    <option value="CSE Cybersecurity">CSE Cybersecurity</option>
+                    <option value="CSE IT">CSE IT</option>
+                    <option value="CSE DS">CSE DS</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-gray-700">College</label>
+                  <select
+                    value={formData.college}
+                    onChange={(e) => setFormData({ ...formData, college: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white font-medium"
+                  >
+                    <option value="" disabled>Select your college</option>
+                    <option value="SRM Institute of Science and Technology">SRM Institute of Science and Technology</option>
+                  </select>
+                </div>
               </div>
             )}
           </div>

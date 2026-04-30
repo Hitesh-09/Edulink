@@ -28,7 +28,7 @@ export function ConnectionCard({ profile, onMessage, onAddToSession }: any) {
           View Profile
         </Button>
         <div className="flex gap-2">
-          <Button variant="primary" size="sm" className="flex-1" onClick={() => onMessage(profile?.id)}>
+          <Button variant="primary" size="sm" className="flex-1" onClick={() => router.push(`/messages/${profile?.id}`)}>
             Message
           </Button>
           <Button variant="secondary" size="sm" className="flex-1" onClick={() => onAddToSession(profile?.id)}>

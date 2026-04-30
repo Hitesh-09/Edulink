@@ -38,16 +38,25 @@ export default function DiscoverPage() {
       if (selectedInterests.length) params.append('interests', selectedInterests.join(','));
 
       const response = await apiFetch<any[]>(`/api/users?${params.toString()}`);
-      setStudents(response || []);
+      
+      // Transform backend nested structure to what the UI expects
+      const mappedStudents = (response || []).map(item => ({
+        ...item.profile,
+        interests: item.interests,
+        initialStatus: item.connectionStatus
+      }));
+
+      setStudents(mappedStudents);
+
+      // Initialize connection statuses from backend data
+      const initialStatuses: Record<string, 'none'|'pending'|'connected'> = {};
+      mappedStudents.forEach(s => {
+        initialStatuses[s.id] = s.initialStatus;
+      });
+      setConnectionStatuses(initialStatuses);
     } catch (error) {
       console.error('Failed to fetch students:', error);
-      // Graceful fallback dummy data if backend isn't ready
-      setStudents([
-        { id: '1', full_name: 'Alice Smith', college: 'MIT', branch: 'Computer Science', year: '3rd', interests: ['AI/ML', 'Web Dev'] },
-        { id: '2', full_name: 'Bob Johnson', college: 'Stanford', branch: 'Electronics', year: '2nd', interests: ['Cybersecurity', 'DSA', 'DevOps'] },
-        { id: '3', full_name: 'Charlie Davis', college: 'Harvard', branch: 'Data Science', year: '4th', interests: ['Data Science', 'AI/ML', 'UI/UX', 'Mobile Dev'] },
-        { id: '4', full_name: 'Diana Prince', college: 'MIT', branch: 'Information Technology', year: '1st', interests: ['Web Dev', 'UI/UX'] }
-      ]);
+      setStudents([]);
     } finally {
       setIsLoading(false);
     }
@@ -75,17 +84,15 @@ export default function DiscoverPage() {
   };
 
   const handleConnect = async (id: string) => {
-    // Optimistic UI update
     setConnectionStatuses(prev => ({ ...prev, [id]: 'pending' }));
     try {
       await apiFetch(`/api/connections/request`, {
         method: 'POST',
-        body: JSON.stringify({ userId: id })
+        body: JSON.stringify({ receiverId: id }) // Use receiverId as expected by backend
       });
     } catch (error) {
       console.error('Failed to send connection request:', error);
-      // We keep it pending visually for preview purposes, or we could revert:
-      // setConnectionStatuses(prev => ({ ...prev, [id]: 'none' }));
+      setConnectionStatuses(prev => ({ ...prev, [id]: 'none' }));
     }
   };
 
@@ -187,11 +194,19 @@ export default function DiscoverPage() {
             {/* Branch Filter */}
             <div>
               <h4 className="text-sm font-semibold text-gray-900 mb-2">Branch</h4>
-              <Input 
-                placeholder="e.g. Computer Science" 
+              <select
                 value={branchFilter}
                 onChange={(e) => setBranchFilter(e.target.value)}
-              />
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
+              >
+                <option value="">All Branches</option>
+                <option value="CSE Core">CSE Core</option>
+                <option value="CSE AIML">CSE AIML</option>
+                <option value="CSE Software">CSE Software</option>
+                <option value="CSE Cybersecurity">CSE Cybersecurity</option>
+                <option value="CSE IT">CSE IT</option>
+                <option value="CSE DS">CSE DS</option>
+              </select>
             </div>
 
             <div className="pt-4 border-t border-border flex flex-col gap-2">

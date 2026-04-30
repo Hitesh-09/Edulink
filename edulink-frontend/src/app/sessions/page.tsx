@@ -34,8 +34,8 @@ export default function SessionsPage() {
       if (sessionsRes.status === 'fulfilled') setSessions(sessionsRes.value || []);
       if (connectionsRes.status === 'fulfilled') {
         const connData = connectionsRes.value || [];
-        // Extract profiles from connection items
-        setConnections(connData.map((c: any) => c.friend || c.profile || c));
+        // Extract profiles from backend shape: { otherUserProfile, interests, connection }
+        setConnections(connData.map((c: any) => c.otherUserProfile || c));
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -67,9 +67,19 @@ export default function SessionsPage() {
       const method = editingSession?.id ? 'PUT' : 'POST';
       const endpoint = editingSession?.id ? `/api/sessions/${editingSession.id}` : '/api/sessions';
       
+      // Map frontend formData to backend CreateSessionPayload
+      const payload = {
+        groupName: formData.title,
+        description: formData.description,
+        participantIds: formData.participants,
+        scheduledAt: `${formData.date}T${formData.time}:00Z`,
+        durationMinutes: formData.duration,
+        status: formData.status // for updates
+      };
+
       await apiFetch(endpoint, {
         method,
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       setToastMessage(editingSession?.id ? 'Session updated successfully!' : 'Session created successfully!');
@@ -98,14 +108,14 @@ export default function SessionsPage() {
 
   const calendarEvents = sessions.map(s => ({
     id: s.id,
-    title: s.title,
-    start: s.date,
-    color: new Date(s.date) > new Date() ? '#2563EB' : '#16A34A'
+    title: s.group_name,
+    start: s.scheduled_at,
+    color: new Date(s.scheduled_at) > new Date() ? '#2563EB' : '#16A34A'
   }));
 
   const upcomingSessions = [...sessions]
-    .filter(s => new Date(s.date) > new Date())
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .filter(s => new Date(s.scheduled_at) > new Date())
+    .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
     .slice(0, 5);
 
   return (

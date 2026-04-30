@@ -130,22 +130,35 @@ export default function ProfileSetupPage() {
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <Input
-                label="College / University"
-                type="text"
-                placeholder="e.g. MIT"
-                value={college}
-                onChange={(e) => setCollege(e.target.value)}
-                required
-              />
-              <Input
-                label="Branch / Major"
-                type="text"
-                placeholder="e.g. Computer Science"
-                value={branch}
-                onChange={(e) => setBranch(e.target.value)}
-                required
-              />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-gray-700">College / University</label>
+                <select
+                  value={college}
+                  onChange={(e) => setCollege(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
+                  required
+                >
+                  <option value="" disabled>Select your college</option>
+                  <option value="SRM Institute of Science and Technology">SRM Institute of Science and Technology</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-gray-700">Branch / Major</label>
+                <select
+                  value={branch}
+                  onChange={(e) => setBranch(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
+                  required
+                >
+                  <option value="" disabled>Select your branch</option>
+                  <option value="CSE Core">CSE Core</option>
+                  <option value="CSE AIML">CSE AIML</option>
+                  <option value="CSE Software">CSE Software</option>
+                  <option value="CSE Cybersecurity">CSE Cybersecurity</option>
+                  <option value="CSE IT">CSE IT</option>
+                  <option value="CSE DS">CSE DS</option>
+                </select>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

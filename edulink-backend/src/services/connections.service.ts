@@ -109,24 +109,56 @@ export const getConnections = async (userId: string) => {
 
 /** Lists received pending requests for a user. */
 export const getReceivedRequests = async (userId: string) => {
-  const { data, error } = await supabase
+  const { data: requests, error } = await supabase
     .from("connection_requests")
-    .select("*, sender:profiles!connection_requests_sender_id_fkey(*)")
+    .select("*")
     .eq("receiver_id", userId)
     .eq("status", "pending");
 
-  if (error) throw appError("Failed to fetch received requests");
-  return data ?? [];
+  if (error) throw appError(`Failed to fetch received requests: ${error.message}`);
+  if (!requests || requests.length === 0) return [];
+
+  // Manual join: fetch profiles for all senders
+  const senderIds = requests.map(r => r.sender_id);
+  const { data: profiles, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .in("id", senderIds);
+
+  if (profileError) throw appError(`Failed to fetch requester profiles: ${profileError.message}`);
+
+  const profileMap = new Map(profiles?.map(p => [p.id, p]));
+  
+  return requests.map(req => ({
+    ...req,
+    sender: profileMap.get(req.sender_id) || null
+  }));
 };
 
 /** Lists sent pending requests for a user. */
 export const getSentRequests = async (userId: string) => {
-  const { data, error } = await supabase
+  const { data: requests, error } = await supabase
     .from("connection_requests")
-    .select("*, receiver:profiles!connection_requests_receiver_id_fkey(*)")
+    .select("*")
     .eq("sender_id", userId)
     .eq("status", "pending");
 
-  if (error) throw appError("Failed to fetch sent requests");
-  return data ?? [];
+  if (error) throw appError(`Failed to fetch sent requests: ${error.message}`);
+  if (!requests || requests.length === 0) return [];
+
+  // Manual join: fetch profiles for all receivers
+  const receiverIds = requests.map(r => r.receiver_id);
+  const { data: profiles, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .in("id", receiverIds);
+
+  if (profileError) throw appError(`Failed to fetch receiver profiles: ${profileError.message}`);
+
+  const profileMap = new Map(profiles?.map(p => [p.id, p]));
+  
+  return requests.map(req => ({
+    ...req,
+    receiver: profileMap.get(req.receiver_id) || null
+  }));
 };

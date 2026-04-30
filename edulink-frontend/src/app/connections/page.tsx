@@ -26,18 +26,34 @@ export default function ConnectionsPage() {
   const fetchConnectionsData = async () => {
     setIsLoading(true);
     try {
-      // Graceful fallback arrays in case the backend API isn't returning correctly structured data yet
-      let connData = [], recvData = [], sentData = [];
-      
-      try { connData = await apiFetch<any[]>('/api/connections') || []; } catch(e) {}
-      try { recvData = await apiFetch<any[]>('/api/connections/requests/received') || []; } catch(e) {}
-      try { sentData = await apiFetch<any[]>('/api/connections/requests/sent') || []; } catch(e) {}
+      const [connData, recvData, sentData] = await Promise.all([
+        apiFetch<any[]>('/api/connections'),
+        apiFetch<any[]>('/api/connections/requests/received'),
+        apiFetch<any[]>('/api/connections/requests/sent')
+      ]);
 
-      setConnections(connData);
-      setReceivedRequests(recvData);
-      setSentRequests(sentData);
+      // Map connected users: backend returns { connection, otherUserProfile, interests }
+      setConnections(connData.map(item => ({
+        ...item.otherUserProfile,
+        interests: item.interests
+      })));
+
+      // Map received requests: backend returns { ..., sender: { profiles } }
+      setReceivedRequests(recvData.map(item => ({
+        ...item,
+        requester: Array.isArray(item.sender) ? item.sender[0] : item.sender
+      })));
+
+      // Map sent requests: backend returns { ..., receiver: { profiles } }
+      setSentRequests(sentData.map(item => ({
+        ...item,
+        receiver: Array.isArray(item.receiver) ? item.receiver[0] : item.receiver
+      })));
     } catch (error) {
       console.error('Failed to fetch connections data:', error);
+      setConnections([]);
+      setReceivedRequests([]);
+      setSentRequests([]);
     } finally {
       setIsLoading(false);
     }
@@ -159,10 +175,10 @@ export default function ConnectionsPage() {
             </div>
           ) : connections.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {connections.map((item, i) => (
+              {connections.map((item) => (
                 <ConnectionCard 
-                  key={i} 
-                  profile={item.friend || item.profile || item} // Adjust based on exact backend shape
+                  key={item.id} 
+                  profile={item} 
                   onMessage={handleMessage} 
                   onAddToSession={handleAddToSession} 
                 />
@@ -182,9 +198,9 @@ export default function ConnectionsPage() {
             </div>
           ) : receivedRequests.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {receivedRequests.map((req, i) => (
+              {receivedRequests.map((req) => (
                 <RequestCard 
-                  key={i} 
+                  key={req.id} 
                   requestId={req.id}
                   profile={req.requester} 
                   type="received" 
@@ -207,9 +223,9 @@ export default function ConnectionsPage() {
             </div>
           ) : sentRequests.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {sentRequests.map((req, i) => (
+              {sentRequests.map((req) => (
                 <RequestCard 
-                  key={i} 
+                  key={req.id} 
                   profile={req.receiver} 
                   type="sent" 
                 />

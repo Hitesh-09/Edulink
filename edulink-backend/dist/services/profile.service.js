@@ -53,9 +53,16 @@ const upsertOwnProfile = async (userId, payload) => {
             throw appError("Failed to reset profile interests");
         }
         if (interests.length > 0) {
-            const { error: insertError } = await supabase_1.supabase.from("profile_interests").insert(interests.map((interestId) => ({
+            const { data: matchedInterests, error: fetchError } = await supabase_1.supabase
+                .from("interests")
+                .select("id")
+                .in("name", interests);
+            if (fetchError || !matchedInterests) {
+                throw appError("Failed to resolve interest IDs");
+            }
+            const { error: insertError } = await supabase_1.supabase.from("profile_interests").insert(matchedInterests.map((interest) => ({
                 profile_id: userId,
-                interest_id: interestId,
+                interest_id: interest.id,
             })));
             if (insertError) {
                 throw appError("Failed to save profile interests");

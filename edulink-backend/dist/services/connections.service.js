@@ -99,11 +99,14 @@ exports.getConnections = getConnections;
 const getReceivedRequests = async (userId) => {
     const { data, error } = await supabase_1.supabase
         .from("connection_requests")
-        .select("*, sender:profiles!connection_requests_sender_id_fkey(*)")
+        // Disambiguate the join since `connection_requests` has *two* FKs to `profiles`
+        // (`sender_id` and `receiver_id`). Using column-based join keeps this resilient
+        // even if the FK constraint name differs across environments.
+        .select("*, sender:profiles!sender_id(*)")
         .eq("receiver_id", userId)
         .eq("status", "pending");
     if (error)
-        throw appError("Failed to fetch received requests");
+        throw appError(`Failed to fetch received requests: ${error.message}`);
     return data ?? [];
 };
 exports.getReceivedRequests = getReceivedRequests;
@@ -111,11 +114,14 @@ exports.getReceivedRequests = getReceivedRequests;
 const getSentRequests = async (userId) => {
     const { data, error } = await supabase_1.supabase
         .from("connection_requests")
-        .select("*, receiver:profiles!connection_requests_receiver_id_fkey(*)")
+        // Disambiguate the join since `connection_requests` has *two* FKs to `profiles`
+        // (`sender_id` and `receiver_id`). Using column-based join keeps this resilient
+        // even if the FK constraint name differs across environments.
+        .select("*, receiver:profiles!receiver_id(*)")
         .eq("sender_id", userId)
         .eq("status", "pending");
     if (error)
-        throw appError("Failed to fetch sent requests");
+        throw appError(`Failed to fetch sent requests: ${error.message}`);
     return data ?? [];
 };
 exports.getSentRequests = getSentRequests;
