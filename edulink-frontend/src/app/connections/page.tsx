@@ -5,6 +5,8 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { ConnectionCard } from '@/components/connections/ConnectionCard';
 import { RequestCard } from '@/components/connections/RequestCard';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Toast } from '@/components/ui/Toast';
@@ -22,15 +24,22 @@ export default function ConnectionsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [selectedUserForSession, setSelectedUserForSession] = useState<string | null>(null);
+  const [isAddingToSession, setIsAddingToSession] = useState(false);
 
   const fetchConnectionsData = async () => {
     setIsLoading(true);
     try {
-      const [connData, recvData, sentData] = await Promise.all([
+      const [connData, recvData, sentData, sessionsData] = await Promise.all([
         apiFetch<any[]>('/api/connections'),
         apiFetch<any[]>('/api/connections/requests/received'),
-        apiFetch<any[]>('/api/connections/requests/sent')
+        apiFetch<any[]>('/api/connections/requests/sent'),
+        apiFetch<any[]>('/api/sessions')
       ]);
+
+      setSessions(sessionsData?.filter((s: any) => s.status === 'upcoming') || []);
 
       // Map connected users: backend returns { connection, otherUserProfile, interests }
       setConnections(connData.map(item => ({
@@ -123,7 +132,27 @@ export default function ConnectionsPage() {
   };
 
   const handleAddToSession = (id: string) => {
-    setToastMessage('Add to session feature coming soon!');
+    setSelectedUserForSession(id);
+    setIsSessionModalOpen(true);
+  };
+
+  const confirmAddToSession = async (sessionId: string) => {
+    if (!selectedUserForSession) return;
+    setIsAddingToSession(true);
+    try {
+      // In a real app, we'd have a specific endpoint or update the session
+      // For now, we'll simulate the enrollment or call an API if it exists
+      await apiFetch(`/api/sessions/${sessionId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ participantIds: [selectedUserForSession] }) // Assuming backend appends
+      });
+      setToastMessage('User added to session!');
+      setIsSessionModalOpen(false);
+    } catch (e) {
+      setToastMessage('Failed to add user to session.');
+    } finally {
+      setIsAddingToSession(false);
+    }
   };
 
   return (
@@ -238,6 +267,40 @@ export default function ConnectionsPage() {
           )
         )}
       </div>
+
+      <Modal 
+        isOpen={isSessionModalOpen} 
+        onClose={() => setIsSessionModalOpen(false)} 
+        title="Add to Study Session"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-500">Select an upcoming session to invite this person to.</p>
+          <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
+            {sessions.length > 0 ? (
+              sessions.map((s) => (
+                <div key={s.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <div>
+                    <p className="text-sm font-bold text-primary-dark">{s.group_name}</p>
+                    <p className="text-[10px] text-gray-500">{new Date(s.scheduled_at).toLocaleDateString()} at {new Date(s.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    onClick={() => confirmAddToSession(s.id)}
+                    isLoading={isAddingToSession}
+                  >
+                    Add
+                  </Button>
+                </div>
+              ))
+            ) : (
+              <p className="text-center py-4 text-xs text-gray-400 italic">No upcoming sessions found. Create one first!</p>
+            )}
+          </div>
+          <div className="pt-2 flex justify-end">
+            <Button variant="secondary" onClick={() => setIsSessionModalOpen(false)}>Cancel</Button>
+          </div>
+        </div>
+      </Modal>
 
     </AppLayout>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -15,6 +16,7 @@ import { Toast } from '@/components/ui/Toast';
 import { apiFetch } from '@/lib/api';
 
 export default function SessionsPage() {
+  const router = useRouter();
   const [sessions, setSessions] = useState<any[]>([]);
   const [connections, setConnections] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +74,7 @@ export default function SessionsPage() {
         groupName: formData.title,
         description: formData.description,
         participantIds: formData.participants,
-        scheduledAt: `${formData.date}T${formData.time}:00Z`,
+        scheduledAt: new Date(`${formData.date}T${formData.time}`).toISOString(),
         durationMinutes: formData.duration,
         status: formData.status // for updates
       };
@@ -126,9 +128,17 @@ export default function SessionsPage() {
         title="Study Sessions" 
         subtitle="Coordinate and join study sessions with your network."
         action={
-          <Button onClick={() => { setEditingSession(null); setIsModalOpen(true); }}>
-            + New Session
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => {
+              const code = prompt('Enter 6-digit Join Code or Session ID:');
+              if (code) router.push(`/sessions/${code}/room`);
+            }}>
+              Join Session
+            </Button>
+            <Button onClick={() => { setEditingSession(null); setIsModalOpen(true); }}>
+              + New Session
+            </Button>
+          </div>
         }
       />
 

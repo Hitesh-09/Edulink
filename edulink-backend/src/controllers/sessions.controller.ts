@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import {
   createSession,
   deleteSession,
+  getSessionById,
   listSessions,
   updateSession,
 } from "../services/sessions.service";
@@ -47,6 +48,23 @@ export const getStudySessions = async (
     if (!userId) return void res.status(401).json({ error: "Unauthorized" });
 
     const result = await listSessions(userId);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Returns details for a specific session by ID or join code. */
+export const getStudySessionDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return void res.status(401).json({ error: "Unauthorized" });
+
+    const result = await getSessionById(req.params.id);
     res.json(result);
   } catch (error) {
     next(error);
