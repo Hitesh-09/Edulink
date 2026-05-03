@@ -18,7 +18,7 @@ const port = process.env.PORT || 3001;
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: ['https://edulink-one.vercel.app', process.env.FRONTEND_URL].filter(Boolean) as string[],
     credentials: true,
   })
 );
