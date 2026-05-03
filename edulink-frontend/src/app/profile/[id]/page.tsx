@@ -110,7 +110,7 @@ export default function UserProfilePage() {
               <h2 className="text-lg font-bold text-primary-dark mb-4">Interests</h2>
               <div className="flex flex-wrap gap-2">
                 {profile.interests?.map((interest: any, i: number) => (
-                  <Badge key={i} variant="blue" className="px-4 py-1.5 text-sm">
+                  <Badge key={i} variant="blue">
                     {typeof interest === 'string' ? interest : interest.name}
                   </Badge>
                 ))}

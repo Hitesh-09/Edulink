@@ -4,9 +4,10 @@ interface BadgeProps {
   children: React.ReactNode;
   variant?: 'blue' | 'green' | 'amber' | 'red' | 'purple';
   size?: 'sm' | 'md';
+  className?: string;
 }
 
-export function Badge({ children, variant = 'blue', size = 'md' }: BadgeProps) {
+export function Badge({ children, variant = 'blue', size = 'md', className = '' }: BadgeProps) {
   const variants = {
     blue: 'bg-blue-100 text-blue-700 border-blue-200',
     green: 'bg-green-100 text-green-700 border-green-200',
@@ -21,7 +22,7 @@ export function Badge({ children, variant = 'blue', size = 'md' }: BadgeProps) {
   };
 
   return (
-    <span className={`inline-flex items-center font-medium rounded-full border ${variants[variant]} ${sizes[size]}`}>
+    <span className={`inline-flex items-center font-medium rounded-full border ${variants[variant]} ${sizes[size]} ${className}`}>
       {children}
     </span>
   );
