@@ -117,7 +117,7 @@ export default function ProfileSetupPage() {
           <form onSubmit={handleNext} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div>
               <h2 className="text-xl font-bold text-primary-dark">Academic Information</h2>
-              <p className="text-sm text-gray-500 mt-1">Let's get to know your academic background.</p>
+              <p className="text-sm text-gray-500 mt-1">Let&apos;s get to know your academic background.</p>
             </div>
 
             <Input
@@ -204,7 +204,7 @@ export default function ProfileSetupPage() {
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <div>
               <h2 className="text-xl font-bold text-primary-dark">Select Your Interests</h2>
-              <p className="text-sm text-gray-500 mt-1">Choose topics you'd like to study and collaborate on (select at least 1).</p>
+              <p className="text-sm text-gray-500 mt-1">Choose topics you&apos;d like to study and collaborate on (select at least 1).</p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">

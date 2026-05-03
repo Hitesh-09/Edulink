@@ -120,7 +120,7 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-0">
                   <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-primary text-lg">📅</div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Joined "Data Structures 101" session</p>
+                    <p className="text-sm font-medium text-gray-900">Joined &quot;Data Structures 101&quot; session</p>
                     <p className="text-xs text-gray-500">Yesterday at 4:00 PM</p>
                   </div>
                 </div>
