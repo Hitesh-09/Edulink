@@ -18,6 +18,7 @@ const port = process.env.PORT || 3001;
 app.use(helmet());
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  'https://edulink-one.vercel.app',
   'http://localhost:3000',
   'http://localhost:3001'
 ].filter(Boolean) as string[];
