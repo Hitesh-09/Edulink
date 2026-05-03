@@ -43,7 +43,6 @@ export const createSession = async (creatorId: string, payload: CreateSessionPay
       description: payload.description ?? null,
       scheduled_at: payload.scheduledAt,
       duration_minutes: payload.durationMinutes,
-      join_code: Math.random().toString(36).substring(2, 8).toUpperCase(),
       status: "upcoming",
     })
     .select("*")
@@ -67,25 +66,6 @@ export const createSession = async (creatorId: string, payload: CreateSessionPay
   if (participantFetchError) throw appError("Failed to fetch session participants");
 
   return { session, participants: participants ?? [] };
-};
-
-/** Fetches a single session by its ID or join code. */
-export const getSessionById = async (sessionId: string) => {
-  // Try UUID first, then join_code
-  const query = sessionId.length > 10 
-    ? supabase.from("study_sessions").select("*").eq("id", sessionId)
-    : supabase.from("study_sessions").select("*").eq("join_code", sessionId);
-
-  const { data: session, error } = await query.single();
-  
-  if (error || !session) throw appError("Session not found", 404);
-
-  const { data: participants } = await supabase
-    .from("session_participants")
-    .select("*, profile:profiles(*)")
-    .eq("session_id", session.id);
-
-  return { ...session, participants: participants ?? [] };
 };
 
 /** Lists sessions visible to the user and normalizes stale statuses. */
