@@ -1,0 +1,428 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Avatar } from '@/components/ui/Avatar';
+import { StatCard } from '@/components/insights/StatCard';
+import { SkeletonCard } from '@/components/ui/SkeletonCard';
+import { Toast } from '@/components/ui/Toast';
+import { apiFetch } from '@/lib/api';
+
+const AVAILABLE_INTERESTS = [
+  'DSA', 'Web Dev', 'AI/ML', 'Cybersecurity', 
+  'Mobile Dev', 'DevOps', 'Data Science', 'UI/UX'
+];
+
+export default function ProfilePage() {
+  const { id } = useParams();
+  const router = useRouter();
+  const supabase = createClientComponentClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const [profile, setProfile] = useState<any>(null);
+  const [insights, setInsights] = useState<any>(null);
+  const [formData, setFormData] = useState<any>({
+    fullName: '',
+    college: '',
+    degree: 'B.Tech',
+    branch: '',
+    year: 1,
+    interests: [] as string[],
+    avatarUrl: ''
+  });
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const [profileData, insightsData] = await Promise.all([
+        apiFetch<any>(`/api/profile/${user.id}`),
+        apiFetch<any>('/api/insights')
+      ]);
+
+      // Safely extract profile data (sometimes backend returns an array or nested object)
+      const actualProfile = Array.isArray(profileData) ? profileData[0] : (profileData?.profile || profileData);
+      
+      setProfile(actualProfile);
+      setInsights(insightsData || {
+        totalSessions: 0,
+        connectionsCount: 0,
+        studyStreak: 0
+      });
+      
+      setFormData({
+        fullName: actualProfile?.full_name || actualProfile?.fullName || '',
+        college: actualProfile?.college || actualProfile?.college || 'SRM Institute of Science and Technology',
+        degree: actualProfile?.degree || 'B.Tech',
+        branch: actualProfile?.branch || '',
+        year: actualProfile?.year || 1,
+        interests: (actualProfile?.interests || []).map((i: any) => i.name || i),
+        avatarUrl: actualProfile?.avatar_url || actualProfile?.avatarUrl || ''
+      });
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+      setToastMessage('Failed to load profile.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    
+    // Safely extract profile data just in case the backend nested it (e.g., { profile: {...}, interests: [...] })
+    const pData = profile?.profile || profile || {};
+    try {
+      setError(null);
+      const payload = {
+        full_name: formData.fullName || pData.full_name || pData.fullName,
+        college: formData.college || pData.college,
+        degree: formData.degree || pData.degree,
+        branch: formData.branch || pData.branch,
+        year: Number(formData.year) || Number(pData.year) || 1,
+        interests: formData.interests?.length > 0 ? formData.interests : pData.interests || [],
+        avatar_url: formData.avatarUrl || pData.avatar_url || pData.avatarUrl
+      };
+
+      // 🛑 PRE-FLIGHT CHECK: Specific field validation
+      const missingFields = [];
+      if (!payload.full_name) missingFields.push("Full Name");
+      if (!payload.college) missingFields.push("College");
+      if (!payload.degree) missingFields.push("Degree");
+      if (!payload.branch) missingFields.push("Branch");
+      if (!payload.year) missingFields.push("Year");
+
+      if (missingFields.length > 0) {
+        const errorMsg = `Required fields missing: ${missingFields.join(", ")}`;
+        setError(errorMsg);
+        setToastMessage("Please fill in all required fields.");
+        console.error("❌ ABORTING:", errorMsg, payload);
+        setIsSaving(false);
+        return; 
+      }
+
+      await apiFetch('/api/profile', {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+
+      setProfile({ ...profile, ...payload });
+      setIsEditing(false);
+      setToastMessage('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      setToastMessage('Failed to save profile.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    if (isEditing) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile with new avatar URL
+      await apiFetch('/api/profile', {
+        method: 'PUT',
+        body: JSON.stringify({
+          full_name: formData.fullName,
+          college: formData.college,
+          degree: formData.degree,
+          branch: formData.branch,
+          year: parseInt(formData.year, 10),
+          interests: formData.interests,
+          avatar_url: publicUrl
+        })
+      });
+
+      setFormData((prev: any) => ({ ...prev, avatarUrl: publicUrl }));
+      setProfile((prev: any) => ({ ...prev, avatar_url: publicUrl }));
+      setToastMessage('Avatar updated successfully!');
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      setToastMessage('Failed to upload avatar.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const toggleInterest = (interest: string) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      interests: prev.interests.includes(interest)
+        ? prev.interests.filter((i: string) => i !== interest)
+        : [...prev.interests, interest]
+    }));
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/auth');
+    router.refresh();
+  };
+
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="space-y-8">
+          <SkeletonCard />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  return (
+    <AppLayout>
+      {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
+      
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-2">
+            <span>⚠️</span>
+            {error}
+          </div>
+          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">✕</button>
+        </div>
+      )}
+      
+      {/* Profile Header */}
+      <div className="bg-surface rounded-2xl border border-border p-8 mb-8 shadow-sm">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+          <div 
+            className={`relative group ${isEditing ? 'cursor-pointer' : ''}`}
+            onClick={handleAvatarClick}
+          >
+            <Avatar 
+              src={profile?.avatar_url} 
+              name={profile?.full_name} 
+              size="lg" 
+              className={`w-32 h-32 text-4xl border-4 ${isEditing ? 'border-primary group-hover:opacity-75 transition-opacity' : 'border-white'}`}
+            />
+            {isEditing && (
+              <div className="absolute inset-0 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <span className="bg-black/50 p-2 rounded-full text-xs font-bold">Change</span>
+              </div>
+            )}
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept="image/*" 
+              onChange={handleFileChange}
+            />
+          </div>
+
+          <div className="flex-1 text-center md:text-left space-y-2">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-primary-dark">{profile?.full_name}</h1>
+                <p className="text-lg text-gray-600">{profile?.college}</p>
+                <p className="text-sm text-gray-500 font-medium uppercase tracking-wide">
+                  {profile?.degree} • {profile?.branch} • Year {profile?.year}
+                </p>
+              </div>
+              <div className="flex justify-center md:justify-end gap-3">
+                {!isEditing ? (
+                  <>
+                    <Button variant="secondary" className="text-red-600 border-red-200 hover:bg-red-50" onClick={handleSignOut}>
+                      Sign Out
+                    </Button>
+                    <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+                  </>
+                ) : (
+                  <div className="flex gap-3">
+                    <Button variant="secondary" onClick={() => setIsEditing(false)} disabled={isSaving}>Cancel</Button>
+                    <Button onClick={handleSave} isLoading={isSaving}>Save Changes</Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <StatCard label="Total Sessions" value={insights?.totalSessions || 0} icon="📚" />
+        <StatCard label="Connections" value={insights?.connectionsCount || 0} icon="🤝" />
+        <StatCard label="Study Streak" value={`${insights?.studyStreak || 0} Days`} icon="🔥" />
+      </div>
+
+      {/* Info Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Academic Info */}
+        <div className="bg-surface rounded-2xl border border-border p-8 shadow-sm">
+          <h2 className="text-xl font-bold text-primary-dark mb-6">Academic Details</h2>
+          <div className="space-y-6">
+            {!isEditing ? (
+              <div className="grid grid-cols-2 gap-y-6">
+                <div>
+                  <p className="text-xs font-medium text-gray-500 uppercase">Degree</p>
+                  <p className="text-base text-gray-900 mt-1 font-medium">{profile?.degree}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500 uppercase">Year</p>
+                  <p className="text-base text-gray-900 mt-1 font-medium">{profile?.year}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-xs font-medium text-gray-500 uppercase">Branch</p>
+                  <p className="text-base text-gray-900 mt-1 font-medium">{profile?.branch}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-xs font-medium text-gray-500 uppercase">College</p>
+                  <p className="text-base text-gray-900 mt-1 font-medium">{profile?.college}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <Input 
+                  label="Full Name" 
+                  value={formData.fullName} 
+                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-medium text-gray-700">Degree</label>
+                    <select 
+                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary bg-white"
+                      value={formData.degree}
+                      onChange={(e) => setFormData({...formData, degree: e.target.value})}
+                    >
+                      <option value="B.Tech">B.Tech</option>
+                      <option value="B.Sc">B.Sc</option>
+                      <option value="BCA">BCA</option>
+                      <option value="MCA">MCA</option>
+                      <option value="M.Tech">M.Tech</option>
+                      <option value="MBA">MBA</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-medium text-gray-700">Year</label>
+                    <select 
+                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary bg-white"
+                      value={formData.year}
+                      onChange={(e) => setFormData({...formData, year: parseInt(e.target.value)})}
+                    >
+                      {[1,2,3,4,5].map(y => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-gray-700">Branch</label>
+                  <select
+                    value={formData.branch}
+                    onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
+                  >
+                    <option value="" disabled>Select your branch</option>
+                    <option value="CSE Core">CSE Core</option>
+                    <option value="CSE AIML">CSE AIML</option>
+                    <option value="CSE Software">CSE Software</option>
+                    <option value="CSE Cybersecurity">CSE Cybersecurity</option>
+                    <option value="CSE IT">CSE IT</option>
+                    <option value="CSE DS">CSE DS</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-gray-700">College</label>
+                  <select
+                    value={formData.college}
+                    onChange={(e) => setFormData({ ...formData, college: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white font-medium"
+                  >
+                    <option value="" disabled>Select your college</option>
+                    <option value="SRM Institute of Science and Technology">SRM Institute of Science and Technology</option>
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Interests */}
+        <div className="bg-surface rounded-2xl border border-border p-8 shadow-sm">
+          <h2 className="text-xl font-bold text-primary-dark mb-6">Study Interests</h2>
+          <div className="flex flex-wrap gap-2">
+            {!isEditing ? (
+              profile?.interests?.map((interest: any) => (
+                <span 
+                  key={interest.id || interest} 
+                  className="px-4 py-2 bg-purple-50 text-purple-700 border border-purple-100 rounded-full text-sm font-medium"
+                >
+                  {interest.name || interest}
+                </span>
+              ))
+            ) : (
+              AVAILABLE_INTERESTS.map(interest => {
+                const isSelected = formData.interests.includes(interest);
+                return (
+                  <button
+                    key={interest}
+                    onClick={() => toggleInterest(interest)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
+                      isSelected 
+                        ? 'bg-purple-100 border-purple-300 text-purple-700 shadow-inner' 
+                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {interest}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
+    </AppLayout>
+  );
+}
