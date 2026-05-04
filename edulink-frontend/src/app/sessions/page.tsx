@@ -15,6 +15,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Toast } from '@/components/ui/Toast';
 import { apiFetch } from '@/lib/api';
 
+import { Calendar } from 'lucide-react';
+
 export default function SessionsPage() {
   const router = useRouter();
   const [sessions, setSessions] = useState<any[]>([]);
@@ -185,7 +187,7 @@ export default function SessionsPage() {
               </div>
             ) : (
               <EmptyState 
-                icon="📅" 
+                icon={<Calendar size={48} className="text-gray-300" />} 
                 heading="No Upcoming Sessions" 
                 subtext="Schedule your first study session to get started!" 
               />

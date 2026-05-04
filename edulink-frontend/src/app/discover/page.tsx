@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { apiFetch } from '@/lib/api';
+import { Search as SearchIcon } from 'lucide-react';
 
 const AVAILABLE_INTERESTS = ['DSA', 'Web Dev', 'AI/ML', 'Cybersecurity', 'Mobile Dev', 'DevOps', 'Data Science', 'UI/UX'];
 const YEARS = ['1st', '2nd', '3rd', '4th', '5th'];
@@ -236,7 +237,7 @@ export default function DiscoverPage() {
           ) : (
             <div className="mt-10">
               <EmptyState 
-                icon="🔍"
+                icon={<SearchIcon size={48} className="text-gray-300" />}
                 heading="No students found"
                 subtext="We couldn't find any students matching your filters. Try adjusting your search criteria."
               />

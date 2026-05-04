@@ -7,6 +7,8 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
+import { X } from 'lucide-react';
+
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   useEffect(() => {
     if (isOpen) {
@@ -32,7 +34,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors p-1"
           >
-            ✕
+            <X size={20} />
           </button>
         </div>
         <div className="p-6 overflow-y-auto">

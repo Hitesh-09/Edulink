@@ -11,6 +11,7 @@ import { StatCard } from '@/components/insights/StatCard';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 import { Toast } from '@/components/ui/Toast';
 import { apiFetch } from '@/lib/api';
+import { AlertTriangle, BookOpen, Users, Zap, X } from 'lucide-react';
 
 const AVAILABLE_INTERESTS = [
   'DSA', 'Web Dev', 'AI/ML', 'Cybersecurity', 
@@ -101,7 +102,7 @@ export default function ProfilePage() {
         avatar_url: formData.avatarUrl || pData.avatar_url || pData.avatarUrl
       };
 
-      // 🛑 PRE-FLIGHT CHECK: Specific field validation
+      // PRE-FLIGHT CHECK: Specific field validation
       const missingFields = [];
       if (!payload.full_name) missingFields.push("Full Name");
       if (!payload.college) missingFields.push("College");
@@ -113,7 +114,7 @@ export default function ProfilePage() {
         const errorMsg = `Required fields missing: ${missingFields.join(", ")}`;
         setError(errorMsg);
         setToastMessage("Please fill in all required fields.");
-        console.error("❌ ABORTING:", errorMsg, payload);
+        console.error("ABORTING:", errorMsg, payload);
         setIsSaving(false);
         return; 
       }
@@ -228,10 +229,12 @@ export default function ProfilePage() {
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium flex items-center justify-between animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center gap-2">
-            <span>⚠️</span>
+            <AlertTriangle size={18} />
             {error}
           </div>
-          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">✕</button>
+          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">
+            <X size={18} />
+          </button>
         </div>
       )}
       
@@ -293,9 +296,9 @@ export default function ProfilePage() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard label="Total Sessions" value={insights?.totalSessions || 0} icon="📚" />
-        <StatCard label="Connections" value={insights?.connectionsCount || 0} icon="🤝" />
-        <StatCard label="Study Streak" value={`${insights?.studyStreak || 0} Days`} icon="🔥" />
+        <StatCard label="Total Sessions" value={insights?.totalSessions || 0} icon={<BookOpen size={20} />} />
+        <StatCard label="Connections" value={insights?.connectionsCount || 0} icon={<Users size={20} />} />
+        <StatCard label="Study Streak" value={`${insights?.studyStreak || 0} Days`} icon={<Zap size={20} />} />
       </div>
 
       {/* Info Grid */}

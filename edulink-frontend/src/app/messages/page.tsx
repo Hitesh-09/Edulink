@@ -8,10 +8,12 @@ import { Avatar } from '@/components/ui/Avatar';
 import { apiFetch } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
+import { MessageSquare } from 'lucide-react';
+
 export default function MessagesPage() {
   const [chats, setChats] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+  const [router] = [useRouter()];
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -69,7 +71,7 @@ export default function MessagesPage() {
         ) : (
           <div className="py-20">
             <EmptyState 
-              icon="💬" 
+              icon={<MessageSquare size={48} className="text-gray-300" />} 
               heading="No Messages Yet" 
               subtext="Connect with students in Discover to start chatting!" 
             />

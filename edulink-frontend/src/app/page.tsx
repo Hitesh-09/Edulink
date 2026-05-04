@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { Zap, Lock, Users } from 'lucide-react';
+
 export default function LandingPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50 p-6 selection:bg-blue-200 overflow-hidden relative">
@@ -42,9 +44,9 @@ export default function LandingPage() {
 
       {/* Trust Badges / Info */}
       <div className="absolute bottom-10 w-full flex justify-center gap-8 text-slate-400 text-sm font-medium opacity-60">
-        <span className="flex items-center gap-2">⚡️ Built with Next.js</span>
-        <span className="flex items-center gap-2">🔒 Secure Auth</span>
-        <span className="flex items-center gap-2">🤝 Peer Learning</span>
+        <span className="flex items-center gap-1.5"><Zap size={14} /> Built with Next.js</span>
+        <span className="flex items-center gap-1.5"><Lock size={14} /> Secure Auth</span>
+        <span className="flex items-center gap-1.5"><Users size={14} /> Peer Learning</span>
       </div>
     </main>
   );

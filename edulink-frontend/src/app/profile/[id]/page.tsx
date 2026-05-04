@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Toast } from '@/components/ui/Toast';
 import { apiFetch } from '@/lib/api';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { GraduationCap, BookOpen, Calendar } from 'lucide-react';
 
 export default function UserProfilePage() {
   const { id } = useParams();
@@ -96,9 +97,9 @@ export default function UserProfilePage() {
             <div>
               <h1 className="text-3xl font-black text-primary-dark">{profile.full_name}</h1>
               <div className="flex flex-wrap items-center gap-y-2 gap-x-4 mt-2 text-gray-500 text-sm">
-                <span className="flex items-center gap-1.5">🎓 {profile.college}</span>
-                <span className="flex items-center gap-1.5">📚 {profile.degree} in {profile.branch}</span>
-                <span className="flex items-center gap-1.5">📅 Year {profile.year}</span>
+                <span className="flex items-center gap-1.5"><GraduationCap size={16} /> {profile.college}</span>
+                <span className="flex items-center gap-1.5"><BookOpen size={16} /> {profile.degree} in {profile.branch}</span>
+                <span className="flex items-center gap-1.5"><Calendar size={16} /> Year {profile.year}</span>
               </div>
             </div>
           </div>

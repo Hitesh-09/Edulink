@@ -11,6 +11,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
 import { apiFetch } from '@/lib/api';
 
+import { Clock, Zap, BookOpen, Users, Calendar, Hand } from 'lucide-react';
+
 export default function DashboardPage() {
   const router = useRouter();
   const supabase = createClientComponentClient();
@@ -67,7 +69,7 @@ export default function DashboardPage() {
   return (
     <AppLayout>
       <PageHeader 
-        title={`Good morning, ${userName} 👋`} 
+        title={`Good morning, ${userName}`} 
         subtitle={currentDate}
         action={
           <div className="flex gap-3 mt-4 sm:mt-0">
@@ -87,10 +89,10 @@ export default function DashboardPage() {
           Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
         ) : (
           <>
-            <StatCard label="Total Study Time" value={insights?.totalTime || '0h'} trend="up" icon="⏳" />
-            <StatCard label="Daily Streak" value={insights?.streak || '0 Days'} trend="up" icon="🔥" />
-            <StatCard label="Sessions Attended" value={insights?.sessionsAttended || 0} trend="neutral" icon="📚" />
-            <StatCard label="Active Connections" value={insights?.activeConnections || 0} trend="up" icon="🤝" />
+            <StatCard label="Total Study Time" value={insights?.totalTime || '0h'} trend="up" icon={<Clock size={20} />} />
+            <StatCard label="Daily Streak" value={insights?.streak || '0 Days'} trend="up" icon={<Zap size={20} />} />
+            <StatCard label="Sessions Attended" value={insights?.sessionsAttended || 0} trend="neutral" icon={<BookOpen size={20} />} />
+            <StatCard label="Active Connections" value={insights?.activeConnections || 0} trend="up" icon={<Users size={20} />} />
           </>
         )}
       </div>
@@ -111,14 +113,18 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 {/* Dummy activity feed items for layout display purposes */}
                 <div className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-0">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-accent text-lg">👋</div>
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-accent">
+                    <Hand size={18} />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Connected with Alex Rivera</p>
+                    <p className="text-sm font-medium text-gray-900">Connected with Hitesh Shimpi</p>
                     <p className="text-xs text-gray-500">2 hours ago</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-0">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-primary text-lg">📅</div>
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-primary">
+                    <Calendar size={18} />
+                  </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">Joined &quot;Data Structures 101&quot; session</p>
                     <p className="text-xs text-gray-500">Yesterday at 4:00 PM</p>
@@ -138,23 +144,34 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 <SkeletonCard />
               </div>
-            ) : sessions.length > 0 ? (
+            ) : sessions.filter(s => new Date(s.scheduled_at) > new Date()).length > 0 ? (
               <div className="space-y-4">
-                {sessions.map((session, i) => (
-                  <div key={i} className="p-4 rounded-xl border border-border bg-gray-50 transition-colors hover:bg-gray-100 cursor-pointer">
-                    <h3 className="font-medium text-primary-dark">{session.title || 'Untitled Session'}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{session.date ? new Date(session.date).toLocaleString() : 'Date TBD'}</p>
-                    <div className="mt-3">
-                      <span className="text-xs font-medium bg-blue-100 text-primary px-2.5 py-1 rounded-full">
-                        {session.participants?.length || 0} participants
-                      </span>
+                {sessions
+                  .filter(s => new Date(s.scheduled_at) > new Date())
+                  .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
+                  .slice(0, 3)
+                  .map((session, i) => (
+                    <div 
+                      key={i} 
+                      onClick={() => router.push(`/sessions/${session.id}/room`)}
+                      className="p-4 rounded-xl border border-border bg-gray-50 transition-colors hover:bg-gray-100 cursor-pointer"
+                    >
+                      <h3 className="font-medium text-primary-dark truncate">{session.group_name || 'Untitled Session'}</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {session.scheduled_at ? new Date(session.scheduled_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Date TBD'}
+                      </p>
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className="text-xs font-medium bg-blue-100 text-primary px-2.5 py-1 rounded-full">
+                          {session.participants?.length || 0} participants
+                        </span>
+                        <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Join Room →</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             ) : (
               <EmptyState 
-                icon="📅" 
+                icon={<Calendar size={48} className="text-gray-300" />} 
                 heading="No Upcoming Sessions" 
                 subtext="You don't have any study sessions scheduled yet."
               />

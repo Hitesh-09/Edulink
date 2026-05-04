@@ -12,6 +12,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Toast } from '@/components/ui/Toast';
 import { apiFetch } from '@/lib/api';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { Users, Inbox, Rocket } from 'lucide-react';
 
 export default function ConnectionsPage() {
   const supabase = createClientComponentClient();
@@ -206,16 +207,20 @@ export default function ConnectionsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {connections.map((item) => (
                 <ConnectionCard 
-                  key={item.id} 
-                  profile={item} 
-                  onMessage={handleMessage} 
-                  onAddToSession={handleAddToSession} 
-                />
+                   key={item.id} 
+                   profile={item} 
+                   onMessage={handleMessage} 
+                   onAddToSession={handleAddToSession} 
+                 />
               ))}
             </div>
           ) : (
             <div className="mt-12">
-              <EmptyState icon="👥" heading="No Connections Yet" subtext="Go to the Discover page to find students to connect with!" />
+              <EmptyState 
+                icon={<Users size={48} className="text-gray-300" />} 
+                heading="No Connections Yet" 
+                subtext="Go to the Discover page to find students to connect with!" 
+              />
             </div>
           )
         )}
@@ -240,7 +245,11 @@ export default function ConnectionsPage() {
             </div>
           ) : (
             <div className="mt-12">
-              <EmptyState icon="📬" heading="No Received Requests" subtext="You don't have any pending incoming connection requests." />
+              <EmptyState 
+                icon={<Inbox size={48} className="text-gray-300" />} 
+                heading="No Received Requests" 
+                subtext="You don't have any pending incoming connection requests." 
+              />
             </div>
           )
         )}
@@ -262,7 +271,11 @@ export default function ConnectionsPage() {
             </div>
           ) : (
             <div className="mt-12">
-              <EmptyState icon="🚀" heading="No Sent Requests" subtext="You haven't sent out any connection requests yet." />
+              <EmptyState 
+                icon={<Rocket size={48} className="text-gray-300" />} 
+                heading="No Sent Requests" 
+                subtext="You haven't sent out any connection requests yet." 
+              />
             </div>
           )
         )}

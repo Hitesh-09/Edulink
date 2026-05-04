@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { Calendar, Clock } from 'lucide-react';
 
 interface SessionCardProps {
   session: any;
@@ -29,11 +30,11 @@ export function SessionCard({ session, onEdit, onDelete }: SessionCardProps) {
 
       <div className="grid grid-cols-2 gap-4 mb-5">
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>📅</span>
+          <Calendar size={16} />
           {sessionDate.toLocaleDateString()}
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>🕒</span>
+          <Clock size={16} />
           {sessionDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ({session.duration_minutes}m)
         </div>
       </div>

@@ -6,6 +6,8 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
+import { MessageSquare } from 'lucide-react';
+
 interface SessionChatProps {
   sessionId: string;
   currentUser: any;
@@ -110,7 +112,9 @@ export default function SessionChat({ sessionId, currentUser }: SessionChatProps
       <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white/50">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-10">
-            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4 text-2xl">💬</div>
+            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4 text-primary">
+              <MessageSquare size={32} />
+            </div>
             <h4 className="font-bold text-gray-900 mb-1">No messages yet</h4>
             <p className="text-sm text-gray-500 max-w-[200px]">Start the conversation with your study group!</p>
           </div>

@@ -2,8 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primary: #2563EB;
+  --primary-dark: #1E3A5F;
+  --primary-light: #EFF6FF;
+  --accent: #7C3AED;
+  --success: #16A34A;
+  --warning: #D97706;
+  --error: #DC2626;
+  --background: #F9FAFB;
+  --surface: #FFFFFF;
+  --border: #E5E7EB;
+  --text-main: #111827;
+  --text-muted: #6B7280;
+}
+
+.dark {
+  --primary: #3B82F6;
+  --primary-dark: #F3F4F6;
+  --primary-light: #1E3A8A;
+  --accent: #A78BFA;
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --background: #0F172A;
+  --surface: #1E293B;
+  --border: #334155;
+  --text-main: #F9FAFB;
+  --text-muted: #94A3B8;
+}
+
 @layer base {
   body {
-    @apply bg-background text-primary-dark;
+    @apply bg-background text-text-main transition-colors duration-200;
   }
+}
+
+/* Custom Scrollbar for Dark Mode */
+.dark ::-webkit-scrollbar {
+  width: 10px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 5px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }
