@@ -97,31 +97,53 @@ const getConnections = async (userId) => {
 exports.getConnections = getConnections;
 /** Lists received pending requests for a user. */
 const getReceivedRequests = async (userId) => {
-    const { data, error } = await supabase_1.supabase
+    const { data: requests, error } = await supabase_1.supabase
         .from("connection_requests")
-        // Disambiguate the join since `connection_requests` has *two* FKs to `profiles`
-        // (`sender_id` and `receiver_id`). Using column-based join keeps this resilient
-        // even if the FK constraint name differs across environments.
-        .select("*, sender:profiles!sender_id(*)")
+        .select("*")
         .eq("receiver_id", userId)
         .eq("status", "pending");
     if (error)
         throw appError(`Failed to fetch received requests: ${error.message}`);
-    return data ?? [];
+    if (!requests || requests.length === 0)
+        return [];
+    // Manual join: fetch profiles for all senders
+    const senderIds = requests.map(r => r.sender_id);
+    const { data: profiles, error: profileError } = await supabase_1.supabase
+        .from("profiles")
+        .select("*")
+        .in("id", senderIds);
+    if (profileError)
+        throw appError(`Failed to fetch requester profiles: ${profileError.message}`);
+    const profileMap = new Map(profiles?.map(p => [p.id, p]));
+    return requests.map(req => ({
+        ...req,
+        sender: profileMap.get(req.sender_id) || null
+    }));
 };
 exports.getReceivedRequests = getReceivedRequests;
 /** Lists sent pending requests for a user. */
 const getSentRequests = async (userId) => {
-    const { data, error } = await supabase_1.supabase
+    const { data: requests, error } = await supabase_1.supabase
         .from("connection_requests")
-        // Disambiguate the join since `connection_requests` has *two* FKs to `profiles`
-        // (`sender_id` and `receiver_id`). Using column-based join keeps this resilient
-        // even if the FK constraint name differs across environments.
-        .select("*, receiver:profiles!receiver_id(*)")
+        .select("*")
         .eq("sender_id", userId)
         .eq("status", "pending");
     if (error)
         throw appError(`Failed to fetch sent requests: ${error.message}`);
-    return data ?? [];
+    if (!requests || requests.length === 0)
+        return [];
+    // Manual join: fetch profiles for all receivers
+    const receiverIds = requests.map(r => r.receiver_id);
+    const { data: profiles, error: profileError } = await supabase_1.supabase
+        .from("profiles")
+        .select("*")
+        .in("id", receiverIds);
+    if (profileError)
+        throw appError(`Failed to fetch receiver profiles: ${profileError.message}`);
+    const profileMap = new Map(profiles?.map(p => [p.id, p]));
+    return requests.map(req => ({
+        ...req,
+        receiver: profileMap.get(req.receiver_id) || null
+    }));
 };
 exports.getSentRequests = getSentRequests;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Button } from '@/components/ui/Button';
@@ -27,6 +27,20 @@ export default function ProfileSetupPage() {
   const [branch, setBranch] = useState('');
   const [year, setYear] = useState('1st');
   const [interests, setInterests] = useState<string[]>([]);
+
+  useEffect(() => {
+    const checkAuthAndPrefill = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push('/auth');
+        return;
+      }
+      if (user.user_metadata?.full_name) {
+        setFullName(user.user_metadata.full_name);
+      }
+    };
+    checkAuthAndPrefill();
+  }, [supabase, router]);
 
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,8 +69,6 @@ export default function ProfileSetupPage() {
     setIsLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-
       await apiFetch('/api/profile', {
         method: 'PUT',
         body: JSON.stringify({
@@ -64,11 +76,12 @@ export default function ProfileSetupPage() {
           college: college,
           degree: degree,
           branch: branch,
-          year: parseInt(year),
+          year: parseInt(year) || 1,
           interests: interests
         }),
       });
 
+      router.refresh();
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred.');
@@ -131,11 +144,11 @@ export default function ProfileSetupPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-gray-700">College / University</label>
+                <label className="text-sm font-medium text-text-main">College / University</label>
                 <select
                   value={college}
                   onChange={(e) => setCollege(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-text-main"
                   required
                 >
                   <option value="" disabled>Select your college</option>
@@ -143,11 +156,11 @@ export default function ProfileSetupPage() {
                 </select>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-gray-700">Branch / Major</label>
+                <label className="text-sm font-medium text-text-main">Branch / Major</label>
                 <select
                   value={branch}
                   onChange={(e) => setBranch(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-text-main"
                   required
                 >
                   <option value="" disabled>Select your branch</option>
@@ -163,9 +176,9 @@ export default function ProfileSetupPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-gray-700">Degree</label>
+                <label className="text-sm font-medium text-text-main">Degree</label>
                 <select
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
+                  className="border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text-main"
                   value={degree}
                   onChange={(e) => setDegree(e.target.value)}
                 >
@@ -179,9 +192,9 @@ export default function ProfileSetupPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-gray-700">Year</label>
+                <label className="text-sm font-medium text-text-main">Year</label>
                 <select
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
+                  className="border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text-main"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                 >
@@ -204,7 +217,7 @@ export default function ProfileSetupPage() {
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <div>
               <h2 className="text-xl font-bold text-primary-dark">Select Your Interests</h2>
-              <p className="text-sm text-gray-500 mt-1">Choose topics you&apos;d like to study and collaborate on (select at least 1).</p>
+              <p className="text-sm text-text-muted mt-1">Choose topics you&apos;d like to study and collaborate on (select at least 1).</p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
@@ -215,8 +228,8 @@ export default function ProfileSetupPage() {
                     key={interest}
                     onClick={() => toggleInterest(interest)}
                     className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors border flex items-center justify-center text-center ${isSelected
-                        ? 'bg-purple-100 text-purple-700 border-purple-200 shadow-inner'
-                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                        ? 'bg-primary/10 text-primary border-primary/30 shadow-inner font-semibold'
+                        : 'bg-surface text-text-muted border-border hover:bg-gray-50 dark:hover:bg-gray-800/50'
                       }`}
                   >
                     {interest}

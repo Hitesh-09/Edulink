@@ -26,7 +26,26 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (user && user.user_metadata?.full_name) {
+        if (!user) {
+          router.push('/auth');
+          return;
+        }
+
+        // Check if profile is complete
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name, is_complete')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profile && profile.is_complete === false) {
+          router.push('/profile-setup');
+          return;
+        }
+
+        if (profile?.full_name) {
+          setUserName(profile.full_name);
+        } else if (user.user_metadata?.full_name) {
           setUserName(user.user_metadata.full_name);
         } else {
           setUserName('Student');
