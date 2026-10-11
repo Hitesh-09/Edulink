@@ -43,35 +43,35 @@ export default function MessagesPage() {
         subtitle="Chat with your study partners and connections."
       />
 
-      <div className="bg-surface rounded-2xl border border-border overflow-hidden shadow-sm">
+      <div className="bg-[#1C1B1C] rounded-2xl border border-stone-800 overflow-hidden shadow-xl shadow-black/20">
         {isLoading ? (
           <div className="p-10 flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF553E]"></div>
           </div>
         ) : chats.length > 0 ? (
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-stone-800">
             {chats.map((chat) => (
               <div 
                 key={chat.id} 
                 onClick={() => router.push(`/messages/${chat.id}`)}
-                className="p-4 flex items-center gap-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                className="p-4 flex items-center gap-4 hover:bg-[#141314] cursor-pointer transition-colors"
               >
                 <Avatar src={chat.avatar} name={chat.name} size="md" />
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-baseline mb-0.5">
-                    <h3 className="font-bold text-primary-dark truncate">{chat.name}</h3>
-                    <span className="text-[10px] text-gray-400">{chat.time}</span>
+                    <h3 className="font-serif font-bold text-stone-100 truncate">{chat.name}</h3>
+                    <span className="text-[10px] text-stone-500">{chat.time}</span>
                   </div>
-                  <p className="text-sm text-gray-500 truncate">{chat.lastMessage}</p>
+                  <p className="text-sm text-stone-400 truncate">{chat.lastMessage}</p>
                 </div>
-                <div className="w-2 h-2 rounded-full bg-primary opacity-0 group-hover:opacity-100"></div>
+                <div className="w-2 h-2 rounded-full bg-[#FF553E] opacity-0 group-hover:opacity-100"></div>
               </div>
             ))}
           </div>
         ) : (
           <div className="py-20">
             <EmptyState 
-              icon={<MessageSquare size={48} className="text-gray-300" />} 
+              icon={<MessageSquare size={48} className="text-stone-600" />} 
               heading="No Messages Yet" 
               subtext="Connect with students in Discover to start chatting!" 
             />

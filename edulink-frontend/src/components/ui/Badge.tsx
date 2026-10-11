@@ -9,11 +9,11 @@ interface BadgeProps {
 
 export function Badge({ children, variant = 'blue', size = 'md', className = '' }: BadgeProps) {
   const variants = {
-    blue: 'bg-blue-100 text-blue-700 border-blue-200',
-    green: 'bg-green-100 text-green-700 border-green-200',
-    amber: 'bg-amber-100 text-amber-700 border-amber-200',
-    red: 'bg-red-100 text-red-700 border-red-200',
-    purple: 'bg-purple-100 text-purple-700 border-purple-200',
+    blue: 'bg-[#FF553E]/10 text-[#FF553E] border-[#FF553E]/30',
+    green: 'bg-emerald-950/50 text-emerald-400 border-emerald-800/60',
+    amber: 'bg-amber-950/50 text-amber-400 border-amber-800/60',
+    red: 'bg-red-950/50 text-red-400 border-red-800/60',
+    purple: 'bg-purple-950/50 text-purple-400 border-purple-800/60',
   };
 
   const sizes = {

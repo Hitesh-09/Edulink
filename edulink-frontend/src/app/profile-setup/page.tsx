@@ -192,46 +192,48 @@ export default function ProfileSetupPage() {
 
   if (authChecking) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-        <div className="flex flex-col items-center gap-3 text-text-muted">
-          <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-medium">Verifying your SRM account...</p>
+      <div className="min-h-screen bg-[#141314] flex flex-col items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3 text-stone-400">
+          <div className="w-10 h-10 border-2 border-[#FF553E] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm font-medium font-serif">Verifying your SRM account...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="w-full max-w-xl bg-surface p-6 sm:p-10 rounded-2xl shadow-sm border border-border">
+    <div className="min-h-screen bg-[#141314] text-[#F3F2F0] flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="w-full max-w-xl bg-[#1C1B1C] p-6 sm:p-10 rounded-3xl shadow-2xl border border-stone-800">
         
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <div className="w-14 h-14 bg-[#FF553E]/10 border border-[#FF553E]/20 text-[#FF553E] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
             <GraduationCap className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl font-bold text-text-main tracking-tight">Complete Your Student Profile</h1>
-          <p className="text-sm text-text-muted mt-1.5">
+          <h1 className="text-2xl sm:text-3xl font-serif text-white tracking-tight">Complete Your Student Profile</h1>
+          <p className="text-sm text-stone-400 mt-2 font-normal">
             Set up your academic details to access SRM resources, PYQs, and subject communities.
           </p>
         </div>
 
         {/* Campus Badge (Locked to KTR) */}
-        <div className="mb-6 p-3.5 bg-blue-50/70 dark:bg-blue-950/20 rounded-xl border border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Building2 className="w-5 h-5 text-primary shrink-0" />
+        <div className="mb-6 p-4 bg-[#141314] rounded-2xl border border-stone-800 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#FF553E]/10 text-[#FF553E] flex items-center justify-center">
+              <Building2 className="w-5 h-5 shrink-0" />
+            </div>
             <div>
-              <p className="text-xs font-semibold text-primary uppercase tracking-wider">Campus</p>
-              <p className="text-sm font-medium text-text-main">SRMIST — Kattankulathur (KTR)</p>
+              <p className="text-[10px] font-semibold text-[#FF553E] uppercase tracking-wider">Campus</p>
+              <p className="text-sm font-medium text-white">SRMIST — Kattankulathur (KTR)</p>
             </div>
           </div>
-          <span className="text-[11px] font-semibold bg-primary text-white px-2.5 py-1 rounded-full">
+          <span className="text-[11px] font-semibold bg-[#FF553E] text-white px-3 py-1 rounded-full shadow-sm shadow-[#FF553E]/20">
             KTR Active
           </span>
         </div>
 
         {error && (
-          <div className="mb-6 text-sm text-error bg-red-50 dark:bg-red-950/30 p-3.5 rounded-xl border border-red-200 dark:border-red-900/50">
+          <div className="mb-6 text-sm text-red-400 bg-red-500/10 p-4 rounded-2xl border border-red-500/20">
             {error}
           </div>
         )}
@@ -256,9 +258,9 @@ export default function ProfileSetupPage() {
               value={registerNo}
               onChange={(e) => setRegisterNo(e.target.value.toUpperCase())}
               required
-              rightElement={<Hash className="w-4 h-4 text-text-muted" />}
+              rightElement={<Hash className="w-4 h-4 text-stone-500" />}
             />
-            <p className="text-[11px] text-text-muted">
+            <p className="text-[11px] text-stone-500">
               Enter your SRM student registration number (RA followed by digits).
             </p>
           </div>
@@ -266,9 +268,9 @@ export default function ProfileSetupPage() {
           {/* Degree & Department */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text-main">Degree</label>
+              <label className="text-sm font-medium text-stone-300">Degree</label>
               <select
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text-main"
+                className="w-full border border-stone-800 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#FF553E]/50 focus:border-[#FF553E] bg-[#141314] text-white"
                 value={degree}
                 onChange={(e) => setDegree(e.target.value)}
                 required
@@ -283,11 +285,11 @@ export default function ProfileSetupPage() {
             </div>
 
             <div className="sm:col-span-2 flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text-main">Department / Branch</label>
+              <label className="text-sm font-medium text-stone-300">Department / Branch</label>
               <select
                 value={branch}
                 onChange={(e) => setBranch(e.target.value)}
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-text-main"
+                className="w-full border border-stone-800 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-[#FF553E]/50 focus:border-[#FF553E] outline-none bg-[#141314] text-white"
                 required
               >
                 {DEPARTMENTS.map((dept) => (
@@ -302,9 +304,9 @@ export default function ProfileSetupPage() {
           {/* Year & Semester */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text-main">Academic Year</label>
+              <label className="text-sm font-medium text-stone-300">Academic Year</label>
               <select
-                className="border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text-main"
+                className="border border-stone-800 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#FF553E]/50 focus:border-[#FF553E] bg-[#141314] text-white"
                 value={year}
                 onChange={(e) => handleYearChange(e.target.value)}
                 required
@@ -317,9 +319,9 @@ export default function ProfileSetupPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text-main">Current Semester</label>
+              <label className="text-sm font-medium text-stone-300">Current Semester</label>
               <select
-                className="border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text-main"
+                className="border border-stone-800 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#FF553E]/50 focus:border-[#FF553E] bg-[#141314] text-white"
                 value={semester}
                 onChange={(e) => setSemester(e.target.value)}
                 required
@@ -337,7 +339,7 @@ export default function ProfileSetupPage() {
             <Button
               type="submit"
               size="lg"
-              className="w-full gap-2 shadow-sm"
+              className="w-full gap-2 shadow-lg shadow-[#FF553E]/20"
               isLoading={isLoading}
             >
               <BookOpen className="w-4 h-4" />

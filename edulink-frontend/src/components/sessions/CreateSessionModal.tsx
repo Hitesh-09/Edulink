@@ -76,9 +76,9 @@ export function CreateSessionModal({
           required
         />
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Description</label>
+          <label className="text-xs font-semibold text-stone-300">Description</label>
           <textarea 
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px]"
+            className="border border-stone-800 bg-[#141314] text-stone-100 placeholder:text-stone-600 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E] min-h-[100px]"
             placeholder="What will you be studying?"
             value={formData.description}
             onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -112,8 +112,8 @@ export function CreateSessionModal({
         />
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Invite Connections</label>
-          <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto p-1 border border-border rounded-lg">
+          <label className="text-xs font-semibold text-stone-300">Invite Connections</label>
+          <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto p-2 border border-stone-800 bg-[#141314] rounded-xl">
             {connections.length > 0 ? (
               connections.map((conn) => {
                 const isSelected = formData.participants.includes(conn.id);
@@ -124,8 +124,8 @@ export function CreateSessionModal({
                     onClick={() => toggleParticipant(conn.id)}
                     className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                       isSelected 
-                        ? 'bg-blue-100 border-primary text-primary' 
-                        : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                        ? 'bg-[#FF553E]/15 border-[#FF553E]/50 text-[#FF553E]' 
+                        : 'bg-[#1C1B1C] border-stone-800 text-stone-400 hover:bg-stone-800 hover:text-stone-200'
                     }`}
                   >
                     {conn.full_name}
@@ -133,12 +133,12 @@ export function CreateSessionModal({
                 );
               })
             ) : (
-              <p className="text-xs text-gray-500 p-2 italic">No active connections to invite.</p>
+              <p className="text-xs text-stone-500 p-2 italic">No active connections to invite.</p>
             )}
           </div>
         </div>
 
-        <div className="pt-4 flex justify-end gap-3">
+        <div className="pt-4 flex justify-end gap-3 border-t border-stone-800/80">
           <Button variant="secondary" type="button" onClick={onClose}>Cancel</Button>
           <Button type="submit" isLoading={isLoading}>{initialData ? "Save Changes" : "Create Session"}</Button>
         </div>

@@ -89,25 +89,25 @@ export default function DashboardPage() {
     <AppLayout>
       <div className="max-w-7xl mx-auto pb-12 space-y-8">
         {/* Welcome SRM Hero Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary via-primary-dark to-slate-900 text-white p-6 md:p-8 shadow-lg shadow-primary/10">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#1C1B1C] via-[#201F20] to-[#161516] text-white p-6 md:p-8 border border-stone-800 shadow-xl shadow-black/40">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FF553E]/10 text-[#FF553E] border border-[#FF553E]/20">
                   <GraduationCap size={14} />
                   SRMIST Kattankulathur (KTR)
                 </span>
                 {profile?.register_no && (
-                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-white/10 text-white/90">
+                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#141314] border border-stone-800 text-stone-300">
                     {profile.register_no}
                   </span>
                 )}
               </div>
 
-              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+              <h1 className="text-2xl md:text-4xl font-serif font-normal tracking-tight text-white">
                 Welcome back, {profile?.full_name || 'Student'}!
               </h1>
-              <p className="text-sm text-white/80 mt-1 max-w-xl">
+              <p className="text-sm text-stone-400 mt-2 max-w-xl font-normal leading-relaxed">
                 {profile?.branch ? `${profile.branch} • Semester ${profile.semester || 1}` : currentDate}
                 {' — '} Access curated lecture notes, PYQs, and solve doubts with your peers.
               </p>
@@ -116,16 +116,16 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3 flex-wrap">
               <Link
                 href="/resources"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-slate-900 font-bold text-xs hover:bg-white/90 transition-all shadow-sm"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FF553E] hover:bg-[#E04732] text-white font-semibold text-xs transition-all shadow-md shadow-[#FF553E]/20 hover:scale-[1.02]"
               >
-                <BookOpen size={16} />
+                <BookOpen size={15} />
                 <span>Browse Notes</span>
               </Link>
               <Link
                 href="/doubts"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/20 backdrop-blur-md text-white font-semibold text-xs transition-all border border-white/20"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#141314] hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-white font-semibold text-xs transition-all"
               >
-                <HelpCircle size={16} />
+                <HelpCircle size={15} className="text-[#FF553E]" />
                 <span>Ask a Doubt</span>
               </Link>
             </div>
@@ -136,14 +136,14 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <Link
             href="/resources?sortBy=popular"
-            className="group bg-surface border border-border hover:border-primary/40 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-center gap-4"
+            className="group bg-[#1C1B1C] border border-stone-800 hover:border-stone-700 rounded-2xl p-5 shadow-sm transition-all flex items-center gap-4"
           >
-            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
-              <BookOpen size={24} />
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold">
+              <BookOpen size={22} />
             </div>
             <div>
-              <p className="text-xs font-medium text-text-muted">Academic Library</p>
-              <h3 className="text-sm font-bold text-text-main group-hover:text-primary transition-colors">
+              <p className="text-xs font-medium text-stone-400">Academic Library</p>
+              <h3 className="text-sm font-bold text-white group-hover:text-[#FF553E] transition-colors">
                 Notes & Exam Papers
               </h3>
             </div>
@@ -151,14 +151,14 @@ export default function DashboardPage() {
 
           <Link
             href="/doubts?status=unresolved"
-            className="group bg-surface border border-border hover:border-primary/40 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-center gap-4"
+            className="group bg-[#1C1B1C] border border-stone-800 hover:border-stone-700 rounded-2xl p-5 shadow-sm transition-all flex items-center gap-4"
           >
-            <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
-              <HelpCircle size={24} />
+            <div className="w-12 h-12 rounded-xl bg-[#FF553E]/10 text-[#FF553E] flex items-center justify-center font-bold">
+              <HelpCircle size={22} />
             </div>
             <div>
-              <p className="text-xs font-medium text-text-muted">Community Doubts</p>
-              <h3 className="text-sm font-bold text-text-main group-hover:text-primary transition-colors">
+              <p className="text-xs font-medium text-stone-400">Community Doubts</p>
+              <h3 className="text-sm font-bold text-white group-hover:text-[#FF553E] transition-colors">
                 Unresolved Questions
               </h3>
             </div>
@@ -166,14 +166,14 @@ export default function DashboardPage() {
 
           <Link
             href="/resources"
-            className="group bg-surface border border-border hover:border-primary/40 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-center gap-4"
+            className="group bg-[#1C1B1C] border border-stone-800 hover:border-stone-700 rounded-2xl p-5 shadow-sm transition-all flex items-center gap-4"
           >
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-              <UploadCloud size={24} />
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
+              <UploadCloud size={22} />
             </div>
             <div>
-              <p className="text-xs font-medium text-text-muted">Share Materials</p>
-              <h3 className="text-sm font-bold text-text-main group-hover:text-primary transition-colors">
+              <p className="text-xs font-medium text-stone-400">Share Materials</p>
+              <h3 className="text-sm font-bold text-white group-hover:text-[#FF553E] transition-colors">
                 Upload for SRMites
               </h3>
             </div>
@@ -183,21 +183,21 @@ export default function DashboardPage() {
         {/* 2-Column Content Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Popular Notes for Current Semester */}
-          <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div className="bg-[#1C1B1C] border border-stone-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+              <div className="flex items-center justify-between mb-5 pb-3.5 border-b border-stone-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
                     <FileText size={18} />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-text-main">Popular Study Materials</h2>
-                    <p className="text-xs text-text-muted">Top notes & PYQs for Semester {profile?.semester || 1}</p>
+                    <h2 className="text-base font-bold font-serif text-white">Popular Study Materials</h2>
+                    <p className="text-xs text-stone-400">Top notes & PYQs for Semester {profile?.semester || 1}</p>
                   </div>
                 </div>
                 <Link
                   href="/resources"
-                  className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+                  className="text-xs font-semibold text-[#FF553E] hover:underline flex items-center gap-1"
                 >
                   View All <ArrowRight size={13} />
                 </Link>
@@ -209,26 +209,26 @@ export default function DashboardPage() {
                     <div
                       key={res.id}
                       onClick={() => window.open(res.file_url, '_blank')}
-                      className="p-3.5 rounded-xl border border-border hover:border-primary/40 bg-gray-50/50 dark:bg-gray-800/30 transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                      className="p-3.5 rounded-xl border border-stone-800/80 hover:border-stone-700 bg-[#141314] transition-all cursor-pointer flex items-center justify-between gap-3 group"
                     >
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary uppercase">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#FF553E]/10 text-[#FF553E] uppercase border border-[#FF553E]/20">
                             {res.resource_type}
                           </span>
-                          <span className="text-xs text-text-muted truncate">{res.subject_name}</span>
+                          <span className="text-xs text-stone-400 truncate">{res.subject_name}</span>
                         </div>
-                        <h4 className="text-xs font-bold text-text-main truncate group-hover:text-primary transition-colors">
+                        <h4 className="text-xs font-bold text-white truncate group-hover:text-[#FF553E] transition-colors">
                           {res.title}
                         </h4>
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs text-text-muted shrink-0">
+                      <div className="flex items-center gap-3 text-xs text-stone-400 shrink-0">
                         <span className="flex items-center gap-1">
-                          <ThumbsUp size={12} />
+                          <ThumbsUp size={12} className="text-stone-500" />
                           {res.upvotes_count || 0}
                         </span>
-                        <span className="flex items-center gap-1 text-primary font-medium">
+                        <span className="flex items-center gap-1 text-[#FF553E] font-medium">
                           <Download size={12} />
                           {res.downloads_count || 0}
                         </span>
@@ -237,19 +237,19 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="py-12 text-center text-xs text-text-muted">
+                <div className="py-12 text-center text-xs text-stone-500">
                   No materials uploaded for this semester yet.{' '}
-                  <Link href="/resources" className="text-primary font-semibold hover:underline">
+                  <Link href="/resources" className="text-[#FF553E] font-semibold hover:underline">
                     Be the first!
                   </Link>
                 </div>
               )}
             </div>
 
-            <div className="mt-4 pt-4 border-t border-border">
+            <div className="mt-5 pt-4 border-t border-stone-800">
               <Link
                 href="/resources"
-                className="w-full py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-text-main font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                className="w-full py-2.5 rounded-xl bg-[#141314] hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
               >
                 <span>Browse All SRM Notes & PYQs</span>
                 <ArrowRight size={13} />
@@ -258,21 +258,21 @@ export default function DashboardPage() {
           </div>
 
           {/* Active Community Doubts */}
-          <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div className="bg-[#1C1B1C] border border-stone-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <div className="flex items-center justify-between mb-5 pb-3.5 border-b border-stone-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#FF553E]/10 text-[#FF553E] flex items-center justify-center">
                     <HelpCircle size={18} />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-text-main">Recent Subject Doubts</h2>
-                    <p className="text-xs text-text-muted">Questions asked by SRM students</p>
+                    <h2 className="text-base font-bold font-serif text-white">Recent Subject Doubts</h2>
+                    <p className="text-xs text-stone-400">Questions asked by SRM students</p>
                   </div>
                 </div>
                 <Link
                   href="/doubts"
-                  className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+                  className="text-xs font-semibold text-[#FF553E] hover:underline flex items-center gap-1"
                 >
                   View All <ArrowRight size={13} />
                 </Link>
@@ -284,28 +284,28 @@ export default function DashboardPage() {
                     <Link
                       key={doubt.id}
                       href={`/doubts/${doubt.id}`}
-                      className="p-3.5 rounded-xl border border-border hover:border-primary/40 bg-gray-50/50 dark:bg-gray-800/30 transition-all flex items-center justify-between gap-3 group"
+                      className="p-3.5 rounded-xl border border-stone-800/80 hover:border-stone-700 bg-[#141314] transition-all flex items-center justify-between gap-3 group"
                     >
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-semibold text-text-muted bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-md">
+                          <span className="text-[10px] font-semibold text-stone-400 bg-stone-800 px-2 py-0.5 rounded-md border border-stone-700/60">
                             {doubt.subject_name}
                           </span>
                           {doubt.is_resolved ? (
-                            <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5">
+                            <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-0.5">
                               <CheckCircle2 size={11} /> Resolved
                             </span>
                           ) : (
-                            <span className="text-[10px] font-bold text-amber-600">Open</span>
+                            <span className="text-[10px] font-bold text-[#FF553E]">Open</span>
                           )}
                         </div>
-                        <h4 className="text-xs font-bold text-text-main truncate group-hover:text-primary transition-colors">
+                        <h4 className="text-xs font-bold text-white truncate group-hover:text-[#FF553E] transition-colors">
                           {doubt.title}
                         </h4>
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs text-text-muted shrink-0">
-                        <span className="flex items-center gap-1 font-medium text-text-main">
+                      <div className="flex items-center gap-2 text-xs text-stone-400 shrink-0">
+                        <span className="flex items-center gap-1 font-medium text-stone-300">
                           <MessageSquare size={12} />
                           {doubt.answers_count || 0}
                         </span>
@@ -314,19 +314,19 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="py-12 text-center text-xs text-text-muted">
+                <div className="py-12 text-center text-xs text-stone-500">
                   No active doubts right now.{' '}
-                  <Link href="/doubts" className="text-primary font-semibold hover:underline">
+                  <Link href="/doubts" className="text-[#FF553E] font-semibold hover:underline">
                     Got a question? Ask here!
                   </Link>
                 </div>
               )}
             </div>
 
-            <div className="mt-4 pt-4 border-t border-border">
+            <div className="mt-5 pt-4 border-t border-stone-800">
               <Link
                 href="/doubts"
-                className="w-full py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-text-main font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                className="w-full py-2.5 rounded-xl bg-[#141314] hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
               >
                 <span>Go to Doubts & Discussion Forum</span>
                 <ArrowRight size={13} />

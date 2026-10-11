@@ -140,35 +140,35 @@ export function UploadResourceModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-xl bg-surface border border-border rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto p-6">
-        <div className="flex items-center justify-between pb-4 border-b border-border">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-xl bg-[#1C1B1C] border border-stone-800 rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-7 text-[#F3F2F0]">
+        <div className="flex items-center justify-between pb-4 border-b border-stone-800">
           <div>
-            <h2 className="text-lg font-bold text-text-main">Upload Study Material</h2>
-            <p className="text-xs text-text-muted">Share notes, PYQs, and manuals with fellow SRM students</p>
+            <h2 className="text-xl font-serif font-bold text-white">Upload Study Material</h2>
+            <p className="text-xs text-stone-400 mt-0.5">Share notes, PYQs, and manuals with fellow SRM students</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-text-muted hover:text-text-main hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+            className="p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-full transition-colors"
           >
             <X size={18} />
           </button>
         </div>
 
         {error && (
-          <div className="mt-4 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+          <div className="mt-4 p-3.5 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-2 text-xs text-red-400">
             <AlertCircle size={15} />
             <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           {/* File Picker */}
           <div>
-            <label className="block text-xs font-semibold text-text-main mb-1.5">
+            <label className="block text-xs font-semibold text-stone-300 mb-1.5">
               Select Document (PDF, DOCX, PPT, Images) *
             </label>
-            <div className="border-2 border-dashed border-border hover:border-primary/50 rounded-xl p-5 text-center cursor-pointer transition-colors relative bg-gray-50/50 dark:bg-gray-800/20">
+            <div className="border-2 border-dashed border-stone-800 hover:border-[#FF553E]/50 rounded-2xl p-6 text-center cursor-pointer transition-colors relative bg-[#141314]">
               <input
                 type="file"
                 onChange={handleFileChange}
@@ -176,16 +176,16 @@ export function UploadResourceModal({
                 className="absolute inset-0 opacity-0 cursor-pointer"
               />
               {file ? (
-                <div className="flex items-center justify-center gap-2 text-sm text-primary font-medium">
-                  <CheckCircle size={18} className="text-emerald-500" />
-                  <span className="truncate max-w-[280px]">{file.name}</span>
-                  <span className="text-xs text-text-muted">({(file.size / (1024 * 1024)).toFixed(1)} MB)</span>
+                <div className="flex items-center justify-center gap-2 text-sm text-[#FF553E] font-medium">
+                  <CheckCircle size={18} className="text-emerald-400" />
+                  <span className="truncate max-w-[280px] text-white">{file.name}</span>
+                  <span className="text-xs text-stone-400">({(file.size / (1024 * 1024)).toFixed(1)} MB)</span>
                 </div>
               ) : (
-                <div className="flex flex-col items-center gap-1.5 text-text-muted">
-                  <UploadCloud size={28} className="text-primary/70" />
-                  <span className="text-xs font-medium text-text-main">Click or drag document here</span>
-                  <span className="text-[11px]">Supports PDF, DOCX up to 50MB</span>
+                <div className="flex flex-col items-center gap-2 text-stone-400">
+                  <UploadCloud size={30} className="text-[#FF553E]" />
+                  <span className="text-xs font-medium text-stone-200">Click or drag document here</span>
+                  <span className="text-[11px] text-stone-500">Supports PDF, DOCX up to 50MB</span>
                 </div>
               )}
             </div>
@@ -193,7 +193,7 @@ export function UploadResourceModal({
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-text-main mb-1">
+            <label className="block text-xs font-semibold text-stone-300 mb-1">
               Title *
             </label>
             <input
@@ -201,7 +201,7 @@ export function UploadResourceModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Unit 2 Tree Traversals & BST Detailed Notes"
-              className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white placeholder:text-stone-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
               required
             />
           </div>
@@ -209,13 +209,13 @@ export function UploadResourceModal({
           {/* Resource Type & Subject */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-text-main mb-1">
+              <label className="block text-xs font-semibold text-stone-300 mb-1">
                 Resource Category *
               </label>
               <select
                 value={resourceType}
                 onChange={(e) => setResourceType(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
               >
                 {RESOURCE_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -226,7 +226,7 @@ export function UploadResourceModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-text-main mb-1">
+              <label className="block text-xs font-semibold text-stone-300 mb-1">
                 Subject Name *
               </label>
               <input
@@ -234,7 +234,7 @@ export function UploadResourceModal({
                 value={subjectName}
                 onChange={(e) => setSubjectName(e.target.value)}
                 placeholder="e.g. Data Structures & Algorithms"
-                className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white placeholder:text-stone-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
                 required
               />
             </div>
@@ -243,7 +243,7 @@ export function UploadResourceModal({
           {/* Subject Code & Department */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-text-main mb-1">
+              <label className="block text-xs font-semibold text-stone-300 mb-1">
                 Subject Code (Optional)
               </label>
               <input
@@ -251,18 +251,18 @@ export function UploadResourceModal({
                 value={subjectCode}
                 onChange={(e) => setSubjectCode(e.target.value)}
                 placeholder="e.g. 21CSC201J"
-                className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white placeholder:text-stone-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-text-main mb-1">
+              <label className="block text-xs font-semibold text-stone-300 mb-1">
                 Department / Branch *
               </label>
               <select
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
               >
                 {DEPARTMENTS.map((dept) => (
                   <option key={dept} value={dept}>
@@ -276,7 +276,7 @@ export function UploadResourceModal({
           {/* Year & Semester */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-text-main mb-1">
+              <label className="block text-xs font-semibold text-stone-300 mb-1">
                 Academic Year *
               </label>
               <select
@@ -286,7 +286,7 @@ export function UploadResourceModal({
                   setYear(y);
                   setSemester(String((Number(y) - 1) * 2 + 1));
                 }}
-                className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
               >
                 <option value="1">1st Year</option>
                 <option value="2">2nd Year</option>
@@ -296,13 +296,13 @@ export function UploadResourceModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-text-main mb-1">
+              <label className="block text-xs font-semibold text-stone-300 mb-1">
                 Semester *
               </label>
               <select
                 value={semester}
                 onChange={(e) => setSemester(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
               >
                 {Array.from({ length: 8 }, (_, i) => i + 1).map((s) => (
                   <option key={s} value={String(s)}>
@@ -315,7 +315,7 @@ export function UploadResourceModal({
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-text-main mb-1">
+            <label className="block text-xs font-semibold text-stone-300 mb-1">
               Description / Topics Covered (Optional)
             </label>
             <textarea
@@ -323,24 +323,24 @@ export function UploadResourceModal({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g. Includes syllabus questions, solved proofs, and past exam patterns..."
               rows={2}
-              className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white placeholder:text-stone-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
             />
           </div>
 
           {/* Actions */}
-          <div className="pt-2 flex items-center justify-end gap-2.5">
+          <div className="pt-2 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={uploading}
-              className="px-4 py-2 rounded-xl border border-border text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="px-5 py-2 rounded-full border border-stone-800 text-sm font-medium text-stone-300 hover:bg-stone-800 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={uploading}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-semibold shadow-sm transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 rounded-full bg-[#FF553E] hover:bg-[#E04732] text-white text-sm font-semibold shadow-md shadow-[#FF553E]/20 transition-all disabled:opacity-50"
             >
               {uploading && <Loader2 size={16} className="animate-spin" />}
               <span>{uploading ? 'Uploading...' : 'Publish Material'}</span>

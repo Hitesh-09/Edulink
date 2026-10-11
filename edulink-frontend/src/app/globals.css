@@ -3,55 +3,56 @@
 @tailwind utilities;
 
 :root {
-  --primary: #2563EB;
-  --primary-dark: #1E3A5F;
-  --primary-light: #EFF6FF;
-  --accent: #7C3AED;
-  --success: #16A34A;
-  --warning: #D97706;
-  --error: #DC2626;
-  --background: #F9FAFB;
-  --surface: #FFFFFF;
-  --border: #E5E7EB;
-  --text-main: #111827;
-  --text-muted: #6B7280;
-}
-
-.dark {
-  --primary: #3B82F6;
-  --primary-dark: #F3F4F6;
-  --primary-light: #1E3A8A;
-  --accent: #A78BFA;
+  --primary: #FF553E;
+  --primary-dark: #E04732;
+  --primary-light: #FF7563;
+  --accent: #FF553E;
   --success: #22C55E;
   --warning: #F59E0B;
   --error: #EF4444;
-  --background: #0F172A;
-  --surface: #1E293B;
-  --border: #334155;
-  --text-main: #F9FAFB;
-  --text-muted: #94A3B8;
+  --background: #141314;
+  --surface: #1C1B1C;
+  --border: #2A282A;
+  --text-main: #F3F2F0;
+  --text-muted: #A8A29E;
+}
+
+.dark {
+  --primary: #FF553E;
+  --primary-dark: #E04732;
+  --primary-light: #FF7563;
+  --accent: #FF553E;
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --background: #141314;
+  --surface: #1C1B1C;
+  --border: #2A282A;
+  --text-main: #F3F2F0;
+  --text-muted: #A8A29E;
 }
 
 @layer base {
   body {
-    @apply bg-background text-text-main transition-colors duration-200;
+    @apply bg-[#141314] text-[#F3F2F0] antialiased selection:bg-[#FF553E] selection:text-white;
   }
 }
 
-/* Custom Scrollbar for Dark Mode */
-.dark ::-webkit-scrollbar {
-  width: 10px;
+/* Custom Editorial Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.dark ::-webkit-scrollbar-track {
-  background: #0F172A;
+::-webkit-scrollbar-track {
+  background: #141314;
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 5px;
+::-webkit-scrollbar-thumb {
+  background: #2A282A;
+  border-radius: 4px;
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+::-webkit-scrollbar-thumb:hover {
+  background: #3F3D3F;
 }

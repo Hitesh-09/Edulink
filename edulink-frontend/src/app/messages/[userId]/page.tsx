@@ -100,15 +100,15 @@ export default function ChatPage() {
     <AppLayout>
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
       
-      <div className="flex flex-col h-[calc(100vh-140px)] bg-surface border border-border rounded-2xl overflow-hidden shadow-sm">
+      <div className="flex flex-col h-[calc(100vh-140px)] bg-[#1C1B1C] border border-stone-800 rounded-2xl overflow-hidden shadow-xl shadow-black/20">
         {/* Chat Header */}
-        <div className="p-4 border-b border-border bg-white flex items-center justify-between">
+        <div className="p-4 border-b border-stone-800 bg-[#161516] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => router.push('/messages')}>←</Button>
             <Avatar src={recipient?.avatar_url} name={recipient?.full_name} size="md" />
             <div>
-              <h3 className="font-bold text-primary-dark">{recipient?.full_name || 'Loading...'}</h3>
-              <p className="text-[10px] text-green-500 font-medium">Online</p>
+              <h3 className="font-serif font-bold text-stone-100">{recipient?.full_name || 'Loading...'}</h3>
+              <p className="text-[10px] text-emerald-400 font-medium">Online</p>
             </div>
           </div>
           <Button variant="secondary" size="sm" onClick={() => router.push(`/profile/${userId}`)}>View Profile</Button>
@@ -117,19 +117,19 @@ export default function ChatPage() {
         {/* Messages area */}
         <div 
           ref={scrollRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/30"
+          className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#141314]"
         >
           {messages.map((msg, i) => {
             const isMe = msg.sender_id === currentUser?.id;
             return (
               <div key={i} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm ${
+                <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl text-sm ${
                   isMe 
-                    ? 'bg-primary text-white rounded-tr-none shadow-sm' 
-                    : 'bg-white border border-border text-gray-800 rounded-tl-none'
+                    ? 'bg-[#FF553E] text-white rounded-tr-none shadow-md shadow-[#FF553E]/20' 
+                    : 'bg-[#1C1B1C] border border-stone-800 text-stone-100 rounded-tl-none'
                 }`}>
                   {msg.content}
-                  <p className={`text-[8px] mt-1 ${isMe ? 'text-blue-100' : 'text-gray-400'}`}>
+                  <p className={`text-[8px] mt-1 ${isMe ? 'text-white/80' : 'text-stone-500'}`}>
                     {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
@@ -139,13 +139,13 @@ export default function ChatPage() {
         </div>
 
         {/* Message Input */}
-        <form onSubmit={handleSend} className="p-4 border-t border-border bg-white">
+        <form onSubmit={handleSend} className="p-4 border-t border-stone-800 bg-[#161516]">
           <div className="flex gap-2">
-            <Input 
+            <input 
               placeholder="Type your message..." 
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              className="bg-gray-50 border-none focus:ring-1"
+              className="flex-1 bg-[#141314] border border-stone-800 text-stone-100 placeholder:text-stone-600 rounded-xl px-4 py-2 text-sm outline-none focus:border-[#FF553E] focus:ring-1 focus:ring-[#FF553E]/20"
             />
             <Button type="submit">Send</Button>
           </div>

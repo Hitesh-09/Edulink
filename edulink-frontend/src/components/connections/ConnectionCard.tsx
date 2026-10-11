@@ -11,17 +11,17 @@ export function ConnectionCard({ profile, onMessage, onAddToSession }: any) {
   };
 
   return (
-    <div className="bg-surface rounded-2xl shadow-sm border border-border p-5 flex flex-col items-center text-center h-full hover:shadow-md transition-shadow">
-      <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold text-xl mb-3 overflow-hidden">
+    <div className="bg-[#1C1B1C] rounded-2xl shadow-lg shadow-black/20 border border-stone-800 hover:border-[#FF553E]/40 p-5 flex flex-col items-center text-center h-full transition-all duration-200">
+      <div className="w-16 h-16 rounded-full bg-[#FF553E]/15 border border-[#FF553E]/30 flex items-center justify-center text-[#FF553E] font-bold text-xl mb-3 overflow-hidden">
         {profile?.avatar_url ? (
           <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
         ) : (
           getInitials(profile?.full_name)
         )}
       </div>
-      <h3 className="font-semibold text-primary-dark line-clamp-1">{profile?.full_name || 'Unknown User'}</h3>
-      <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{profile?.college || 'Unknown College'}</p>
-      <p className="text-xs text-gray-500 line-clamp-1 mb-5">{profile?.branch || 'Unknown Branch'}</p>
+      <h3 className="font-serif font-bold text-stone-100 text-base line-clamp-1">{profile?.full_name || 'Unknown User'}</h3>
+      <p className="text-xs text-stone-400 line-clamp-1 mt-0.5">{profile?.college || 'Unknown College'}</p>
+      <p className="text-xs text-stone-400 line-clamp-1 mb-5">{profile?.branch || 'Unknown Branch'}</p>
 
       <div className="mt-auto w-full flex flex-col gap-2">
         <Button variant="secondary" size="sm" onClick={() => router.push(`/profile/${profile?.id}`)}>

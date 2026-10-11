@@ -114,7 +114,7 @@ export default function SessionsPage() {
     id: s.id,
     title: s.group_name,
     start: s.scheduled_at,
-    color: new Date(s.scheduled_at) > new Date() ? '#2563EB' : '#16A34A'
+    color: new Date(s.scheduled_at) > new Date() ? '#FF553E' : '#10B981'
   }));
 
   const upcomingSessions = [...sessions]
@@ -146,7 +146,7 @@ export default function SessionsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Calendar Column */}
-        <div className="lg:col-span-2 bg-surface rounded-2xl border border-border p-6 shadow-sm overflow-hidden">
+        <div className="lg:col-span-2 bg-[#1C1B1C] rounded-2xl border border-stone-800 p-6 shadow-xl shadow-black/20 overflow-hidden">
           <div className="full-calendar-wrapper">
             <FullCalendar
               plugins={[dayGridPlugin, interactionPlugin]}
@@ -166,8 +166,8 @@ export default function SessionsPage() {
 
         {/* Sidebar Column */}
         <div className="space-y-6">
-          <div className="bg-surface rounded-2xl border border-border p-6 shadow-sm h-full flex flex-col">
-            <h2 className="text-lg font-semibold text-primary-dark mb-6">Upcoming Sessions</h2>
+          <div className="bg-[#1C1B1C] rounded-2xl border border-stone-800 p-6 shadow-xl shadow-black/20 h-full flex flex-col">
+            <h2 className="text-lg font-serif font-bold text-stone-100 mb-6">Upcoming Sessions</h2>
             
             {isLoading ? (
               <div className="space-y-4">
@@ -187,7 +187,7 @@ export default function SessionsPage() {
               </div>
             ) : (
               <EmptyState 
-                icon={<Calendar size={48} className="text-gray-300" />} 
+                icon={<Calendar size={48} className="text-stone-600" />} 
                 heading="No Upcoming Sessions" 
                 subtext="Schedule your first study session to get started!" 
               />
@@ -207,12 +207,16 @@ export default function SessionsPage() {
 
       <style jsx global>{`
         .fc { font-family: inherit; }
-        .fc .fc-toolbar-title { font-size: 1.125rem; font-weight: 700; color: #1E3A5F; }
-        .fc .fc-button-primary { background-color: #F9FAFB; border-color: #E5E7EB; color: #4B5563; font-weight: 500; text-transform: capitalize; }
-        .fc .fc-button-primary:hover { background-color: #F3F4F6; border-color: #D1D5DB; color: #111827; }
-        .fc .fc-button-primary:not(:disabled).fc-button-active { background-color: #EFF6FF; border-color: #2563EB; color: #2563EB; }
-        .fc .fc-daygrid-day.fc-day-today { background-color: #F0F9FF; }
-        .fc .fc-event { border-radius: 6px; padding: 2px 4px; font-size: 0.75rem; border: none; cursor: pointer; }
+        .fc table { border-color: #2A282A !important; }
+        .fc th, .fc td { border-color: #2A282A !important; }
+        .fc .fc-toolbar-title { font-size: 1.125rem; font-family: serif; font-weight: 700; color: #F3F2F0; }
+        .fc .fc-button-primary { background-color: #141314; border-color: #2A282A; color: #A8A29E; font-weight: 500; text-transform: capitalize; border-radius: 0.75rem; }
+        .fc .fc-button-primary:hover { background-color: #222122; border-color: #3F3D3F; color: #F3F2F0; }
+        .fc .fc-button-primary:not(:disabled).fc-button-active { background-color: rgba(255, 85, 62, 0.15); border-color: #FF553E; color: #FF553E; }
+        .fc .fc-daygrid-day.fc-day-today { background-color: rgba(255, 85, 62, 0.08) !important; }
+        .fc .fc-col-header-cell-cushion { color: #A8A29E; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; }
+        .fc .fc-daygrid-day-number { color: #A8A29E; font-size: 0.8rem; font-weight: 500; }
+        .fc .fc-event { border-radius: 6px; padding: 2px 4px; font-size: 0.75rem; border: none; cursor: pointer; font-weight: 600; }
       `}</style>
     </AppLayout>
   );

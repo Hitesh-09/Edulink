@@ -99,24 +99,24 @@ export function ResourceCard({ resource, onUpvoteChange }: ResourceCardProps) {
   };
 
   return (
-    <div className="group relative bg-surface border border-border hover:border-primary/40 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+    <div className="group relative bg-[#1C1B1C] border border-stone-800 hover:border-stone-700 rounded-3xl p-5 shadow-lg transition-all flex flex-col justify-between">
       <div>
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-2 mb-3">
-          <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold border ${typeConfig.bg} ${typeConfig.color}`}>
+          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${typeConfig.bg} ${typeConfig.color}`}>
             {typeConfig.label}
           </span>
-          <div className="flex items-center gap-1.5 text-xs text-text-muted">
-            <span className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 font-medium text-text-main">
+          <div className="flex items-center gap-1.5 text-xs text-stone-400">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#141314] border border-stone-800 font-medium text-stone-300">
               Sem {resource.semester}
             </span>
             <button
               onClick={handleBookmark}
               aria-label="Bookmark resource"
-              className={`p-1.5 rounded-lg transition-colors ${
+              className={`p-1.5 rounded-full transition-colors ${
                 hasBookmarked 
-                  ? 'text-primary bg-primary/10' 
-                  : 'text-text-muted hover:text-text-main hover:bg-gray-100 dark:hover:bg-gray-800'
+                  ? 'text-[#FF553E] bg-[#FF553E]/10' 
+                  : 'text-stone-500 hover:text-white hover:bg-stone-800'
               }`}
             >
               <Bookmark size={15} fill={hasBookmarked ? 'currentColor' : 'none'} />
@@ -125,53 +125,53 @@ export function ResourceCard({ resource, onUpvoteChange }: ResourceCardProps) {
         </div>
 
         {/* Title & Subject */}
-        <h3 className="font-bold text-base text-text-main line-clamp-2 group-hover:text-primary transition-colors mb-1">
+        <h3 className="font-bold text-base text-white line-clamp-2 group-hover:text-[#FF553E] transition-colors mb-1">
           {resource.title}
         </h3>
 
-        <div className="flex items-center gap-1.5 text-xs font-medium text-primary mb-2">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-[#FF553E] mb-2">
           <span>{resource.subject_name}</span>
           {resource.subject_code && (
-            <span className="text-text-muted font-normal">({resource.subject_code})</span>
+            <span className="text-stone-500 font-normal">({resource.subject_code})</span>
           )}
         </div>
 
         {resource.description && (
-          <p className="text-xs text-text-muted line-clamp-2 mb-3">
+          <p className="text-xs text-stone-400 line-clamp-2 mb-3 leading-relaxed">
             {resource.description}
           </p>
         )}
 
         {/* Department tag */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span className="inline-flex items-center gap-1 text-[11px] text-text-muted bg-gray-100 dark:bg-gray-800/80 px-2.5 py-0.5 rounded-md">
-            <GraduationCap size={12} />
+          <span className="inline-flex items-center gap-1 text-[11px] text-stone-400 bg-[#141314] border border-stone-800/80 px-3 py-0.5 rounded-full">
+            <GraduationCap size={12} className="text-[#FF553E]" />
             {resource.department}
           </span>
-          <span className="text-[11px] text-text-muted">
+          <span className="text-[11px] text-stone-500">
             {formatFileSize(resource.file_size)}
           </span>
         </div>
       </div>
 
       {/* Footer Info & Actions */}
-      <div className="pt-3 border-t border-border mt-auto flex items-center justify-between text-xs">
-        <div className="flex items-center gap-2 text-text-muted">
-          <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px]">
+      <div className="pt-3.5 border-t border-stone-800/80 mt-auto flex items-center justify-between text-xs">
+        <div className="flex items-center gap-2 text-stone-400">
+          <div className="w-6 h-6 rounded-full bg-[#FF553E]/10 border border-[#FF553E]/20 text-[#FF553E] flex items-center justify-center font-bold text-[10px]">
             {resource.uploader?.full_name ? resource.uploader.full_name[0].toUpperCase() : 'S'}
           </div>
-          <span className="truncate max-w-[100px] font-medium text-text-main">
+          <span className="truncate max-w-[100px] font-medium text-stone-300">
             {resource.uploader?.full_name || 'SRM Student'}
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <button
             onClick={handleUpvote}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-medium transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium transition-colors ${
               hasUpvoted
-                ? 'bg-primary/10 text-primary'
-                : 'text-text-muted hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-text-main'
+                ? 'bg-[#FF553E]/10 border border-[#FF553E]/20 text-[#FF553E]'
+                : 'text-stone-400 hover:bg-stone-800 hover:text-white'
             }`}
           >
             <ThumbsUp size={13} fill={hasUpvoted ? 'currentColor' : 'none'} />
@@ -180,7 +180,7 @@ export function ResourceCard({ resource, onUpvoteChange }: ResourceCardProps) {
 
           <button
             onClick={handleDownload}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white font-semibold transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#FF553E] hover:bg-[#E04732] text-white font-semibold transition-all shadow-md shadow-[#FF553E]/20"
           >
             <Download size={13} />
             <span>Download</span>

@@ -82,23 +82,23 @@ export default function ResourcesPage() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-semibold text-xs flex items-center gap-1">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-3 py-1 rounded-full bg-[#FF553E]/10 border border-[#FF553E]/20 text-[#FF553E] font-semibold text-xs flex items-center gap-1.5">
                 <Sparkles size={12} />
-                SRM KTR StuDocu Hub
+                SRM KTR StuDocu Library
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-text-main tracking-tight">
+            <h1 className="text-2xl md:text-4xl font-serif text-white tracking-tight">
               Academic Resource Library
             </h1>
-            <p className="text-sm text-text-muted mt-1">
+            <p className="text-sm text-stone-400 mt-1.5">
               Access lecture notes, past year questions (PYQs), lab records, and syllabus materials.
             </p>
           </div>
 
           <button
             onClick={() => setIsUploadOpen(true)}
-            className="self-start md:self-auto flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-semibold text-sm shadow-md shadow-primary/20 transition-all hover:scale-[1.02]"
+            className="self-start md:self-auto flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#FF553E] hover:bg-[#E04732] text-white font-semibold text-sm shadow-md shadow-[#FF553E]/20 transition-all hover:scale-[1.02]"
           >
             <Plus size={18} />
             <span>Upload Notes / PYQ</span>
@@ -106,17 +106,17 @@ export default function ResourcesPage() {
         </div>
 
         {/* Search & Main Filter Controls */}
-        <div className="bg-surface border border-border rounded-2xl p-4 md:p-5 mb-8 shadow-sm space-y-4">
+        <div className="bg-[#1C1B1C] border border-stone-800 rounded-3xl p-5 mb-8 shadow-xl space-y-4">
           <div className="flex flex-col sm:flex-row items-center gap-3">
             {/* Search Input */}
             <div className="relative flex-1 w-full">
-              <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+              <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-500" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by topic, subject (e.g. Data Structures), or code (21CSC201J)..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white placeholder:text-stone-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
               />
             </div>
 
@@ -125,7 +125,7 @@ export default function ResourcesPage() {
               <select
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
               >
                 {DEPARTMENTS.map((d) => (
                   <option key={d} value={d}>
@@ -140,7 +140,7 @@ export default function ResourcesPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-800 bg-[#141314] text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E]"
               >
                 <option value="popular">Most Upvoted</option>
                 <option value="downloads">Most Downloaded</option>
@@ -150,15 +150,15 @@ export default function ResourcesPage() {
           </div>
 
           {/* Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none border-t border-border pt-3">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none border-t border-stone-800/80 pt-3.5">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setCategory(cat.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                   category === cat.id
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'bg-gray-100 dark:bg-gray-800 text-text-muted hover:text-text-main'
+                    ? 'bg-[#FF553E] text-white shadow-sm shadow-[#FF553E]/20'
+                    : 'bg-[#141314] hover:bg-stone-800 border border-stone-800 text-stone-400 hover:text-white'
                 }`}
               >
                 {cat.label}
@@ -168,13 +168,13 @@ export default function ResourcesPage() {
 
           {/* Semester Selector Pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none pt-1">
-            <span className="text-xs font-medium text-text-muted whitespace-nowrap mr-1">Semester:</span>
+            <span className="text-xs font-medium text-stone-400 whitespace-nowrap mr-1">Semester:</span>
             <button
               onClick={() => setSemester('')}
-              className={`px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`px-3.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                 semester === ''
-                  ? 'bg-text-main text-surface font-semibold'
-                  : 'bg-gray-50 dark:bg-gray-800/60 text-text-muted hover:text-text-main'
+                  ? 'bg-white text-stone-900 font-semibold'
+                  : 'bg-[#141314] border border-stone-800/80 text-stone-400 hover:text-white'
               }`}
             >
               All Semesters
@@ -183,10 +183,10 @@ export default function ResourcesPage() {
               <button
                 key={sem}
                 onClick={() => setSemester(sem)}
-                className={`px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                className={`px-3.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                   semester === sem
-                    ? 'bg-text-main text-surface font-semibold'
-                    : 'bg-gray-50 dark:bg-gray-800/60 text-text-muted hover:text-text-main'
+                    ? 'bg-[#FF553E] text-white font-semibold shadow-sm'
+                    : 'bg-[#141314] border border-stone-800/80 text-stone-400 hover:text-white'
                 }`}
               >
                 Sem {sem}
@@ -199,13 +199,13 @@ export default function ResourcesPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-surface border border-border rounded-2xl p-5 h-56 animate-pulse flex flex-col justify-between">
+              <div key={i} className="bg-[#1C1B1C] border border-stone-800 rounded-2xl p-5 h-56 animate-pulse flex flex-col justify-between">
                 <div className="space-y-3">
-                  <div className="w-24 h-5 bg-gray-200 dark:bg-gray-800 rounded-md" />
-                  <div className="w-full h-5 bg-gray-200 dark:bg-gray-800 rounded-md" />
-                  <div className="w-1/2 h-4 bg-gray-200 dark:bg-gray-800 rounded-md" />
+                  <div className="w-24 h-5 bg-stone-800 rounded-md" />
+                  <div className="w-full h-5 bg-stone-800 rounded-md" />
+                  <div className="w-1/2 h-4 bg-stone-800 rounded-md" />
                 </div>
-                <div className="w-full h-8 bg-gray-200 dark:bg-gray-800 rounded-md" />
+                <div className="w-full h-8 bg-stone-800 rounded-md" />
               </div>
             ))}
           </div>
@@ -224,19 +224,19 @@ export default function ResourcesPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-surface border border-border rounded-2xl p-12 text-center max-w-lg mx-auto">
-            <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="bg-[#1C1B1C] border border-stone-800 rounded-3xl p-12 text-center max-w-lg mx-auto">
+            <div className="w-14 h-14 bg-[#FF553E]/10 border border-[#FF553E]/20 text-[#FF553E] rounded-2xl flex items-center justify-center mx-auto mb-4">
               <BookOpen size={28} />
             </div>
-            <h3 className="text-lg font-bold text-text-main mb-1">No Study Materials Found</h3>
-            <p className="text-xs text-text-muted mb-6">
+            <h3 className="text-lg font-serif font-bold text-white mb-1.5">No Study Materials Found</h3>
+            <p className="text-xs text-stone-400 mb-6 leading-relaxed">
               {search || department !== 'All Departments' || semester !== ''
                 ? 'Try adjusting your filters or search terms.'
                 : 'No documents have been uploaded yet. Be the first to share notes with SRMites!'}
             </p>
             <button
               onClick={() => setIsUploadOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-semibold shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#FF553E] hover:bg-[#E04732] text-white text-sm font-semibold shadow-md shadow-[#FF553E]/20 transition-all"
             >
               <Plus size={16} />
               <span>Upload Notes for this Subject</span>

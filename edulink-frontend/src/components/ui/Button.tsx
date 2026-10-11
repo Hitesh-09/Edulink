@@ -9,19 +9,19 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = '', variant = 'primary', size = 'md', isLoading = false, children, disabled, ...props }, ref) => {
     
-    const baseStyles = 'inline-flex items-center justify-center rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background disabled:opacity-50 disabled:pointer-events-none';
+    const baseStyles = 'inline-flex items-center justify-center rounded-full font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[#FF553E] focus:ring-offset-2 focus:ring-offset-[#141314] disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]';
     
     const variants = {
-      primary: 'bg-primary text-white hover:opacity-90 shadow-sm active:scale-95',
-      secondary: 'border border-border text-text-main hover:bg-gray-50 dark:hover:bg-gray-800 bg-surface shadow-sm active:scale-95',
-      danger: 'bg-error text-white hover:opacity-90 active:scale-95',
-      ghost: 'text-text-muted hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-text-main transition-colors',
+      primary: 'bg-[#FF553E] text-white hover:bg-[#E04732] shadow-md shadow-[#FF553E]/20',
+      secondary: 'bg-[#1C1B1C] border border-stone-800 text-stone-200 hover:bg-stone-800 hover:text-white shadow-sm',
+      danger: 'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20',
+      ghost: 'text-stone-400 hover:bg-stone-800/60 hover:text-white transition-colors',
     };
     
     const sizes = {
-      sm: 'h-8 px-3 text-xs',
-      md: 'h-10 px-4 py-2 text-sm',
-      lg: 'h-12 px-6 py-3 text-base',
+      sm: 'h-8 px-3.5 text-xs',
+      md: 'h-10 px-5 text-sm',
+      lg: 'h-12 px-7 text-base',
     };
 
     return (

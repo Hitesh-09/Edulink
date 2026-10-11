@@ -165,11 +165,11 @@ export default function ConnectionsPage() {
         subtitle="Manage your network and study partners."
       />
 
-      <div className="mb-6 border-b border-border">
+      <div className="mb-6 border-b border-stone-800">
         <div className="flex gap-6 overflow-x-auto hide-scrollbar">
           <button
             className={`pb-3 text-sm font-medium whitespace-nowrap transition-colors ${
-              activeTab === 'connected' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-gray-700'
+              activeTab === 'connected' ? 'text-[#FF553E] border-b-2 border-[#FF553E] font-semibold' : 'text-stone-400 hover:text-stone-200'
             }`}
             onClick={() => setActiveTab('connected')}
           >
@@ -177,18 +177,18 @@ export default function ConnectionsPage() {
           </button>
           <button
             className={`pb-3 text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-2 ${
-              activeTab === 'received' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-gray-700'
+              activeTab === 'received' ? 'text-[#FF553E] border-b-2 border-[#FF553E] font-semibold' : 'text-stone-400 hover:text-stone-200'
             }`}
             onClick={() => setActiveTab('received')}
           >
             Received 
-            <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === 'received' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'}`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${activeTab === 'received' ? 'bg-[#FF553E] text-white' : 'bg-stone-800 text-stone-300'}`}>
               {receivedRequests.length}
             </span>
           </button>
           <button
             className={`pb-3 text-sm font-medium whitespace-nowrap transition-colors ${
-              activeTab === 'sent' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-gray-700'
+              activeTab === 'sent' ? 'text-[#FF553E] border-b-2 border-[#FF553E] font-semibold' : 'text-stone-400 hover:text-stone-200'
             }`}
             onClick={() => setActiveTab('sent')}
           >
@@ -217,7 +217,7 @@ export default function ConnectionsPage() {
           ) : (
             <div className="mt-12">
               <EmptyState 
-                icon={<Users size={48} className="text-gray-300" />} 
+                icon={<Users size={48} className="text-stone-600" />} 
                 heading="No Connections Yet" 
                 subtext="Go to the Discover page to find students to connect with!" 
               />
@@ -246,7 +246,7 @@ export default function ConnectionsPage() {
           ) : (
             <div className="mt-12">
               <EmptyState 
-                icon={<Inbox size={48} className="text-gray-300" />} 
+                icon={<Inbox size={48} className="text-stone-600" />} 
                 heading="No Received Requests" 
                 subtext="You don't have any pending incoming connection requests." 
               />
@@ -272,7 +272,7 @@ export default function ConnectionsPage() {
           ) : (
             <div className="mt-12">
               <EmptyState 
-                icon={<Rocket size={48} className="text-gray-300" />} 
+                icon={<Rocket size={48} className="text-stone-600" />} 
                 heading="No Sent Requests" 
                 subtext="You haven't sent out any connection requests yet." 
               />
@@ -287,14 +287,14 @@ export default function ConnectionsPage() {
         title="Add to Study Session"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-500">Select an upcoming session to invite this person to.</p>
+          <p className="text-sm text-stone-400">Select an upcoming session to invite this person to.</p>
           <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
             {sessions.length > 0 ? (
               sessions.map((s) => (
-                <div key={s.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                <div key={s.id} className="flex items-center justify-between p-3.5 bg-[#141314] rounded-xl border border-stone-800">
                   <div>
-                    <p className="text-sm font-bold text-primary-dark">{s.group_name}</p>
-                    <p className="text-[10px] text-gray-500">{new Date(s.scheduled_at).toLocaleDateString()} at {new Date(s.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    <p className="text-sm font-serif font-bold text-stone-100">{s.group_name}</p>
+                    <p className="text-[10px] text-stone-500">{new Date(s.scheduled_at).toLocaleDateString()} at {new Date(s.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                   <Button 
                     size="sm" 
@@ -306,10 +306,10 @@ export default function ConnectionsPage() {
                 </div>
               ))
             ) : (
-              <p className="text-center py-4 text-xs text-gray-400 italic">No upcoming sessions found. Create one first!</p>
+              <p className="text-center py-4 text-xs text-stone-500 italic">No upcoming sessions found. Create one first!</p>
             )}
           </div>
-          <div className="pt-2 flex justify-end">
+          <div className="pt-3 flex justify-end border-t border-stone-800/80">
             <Button variant="secondary" onClick={() => setIsSessionModalOpen(false)}>Cancel</Button>
           </div>
         </div>

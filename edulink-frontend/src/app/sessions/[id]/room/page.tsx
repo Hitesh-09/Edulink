@@ -90,23 +90,23 @@ export default function StudyRoomPage() {
       
       <div className="flex flex-col h-[calc(100vh-120px)] max-w-6xl mx-auto">
         {/* Room Header */}
-        <div className="bg-surface border border-border rounded-2xl p-4 mb-4 flex items-center justify-between shadow-sm">
+        <div className="bg-[#1C1B1C] border border-stone-800 rounded-2xl p-4 mb-4 flex items-center justify-between shadow-xl shadow-black/20">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" onClick={() => router.back()}>
               <ArrowLeft size={16} className="mr-1" /> Back
             </Button>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-primary-dark">{session?.group_name}</h1>
+                <h1 className="text-xl font-serif font-bold text-stone-100">{session?.group_name}</h1>
                 <Badge variant="blue">Study Room</Badge>
               </div>
-              <p className="text-xs text-gray-500 mt-0.5">Join Code: <code className="bg-primary/10 text-primary font-bold px-2 py-0.5 rounded border border-primary/20">{session?.join_code || sessionId?.toString().substring(0, 6).toUpperCase()}</code></p>
+              <p className="text-xs text-stone-400 mt-0.5">Join Code: <code className="bg-[#FF553E]/10 text-[#FF553E] font-bold px-2 py-0.5 rounded border border-[#FF553E]/20">{session?.join_code || sessionId?.toString().substring(0, 6).toUpperCase()}</code></p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex -space-x-2">
               {session?.participants?.slice(0, 5).map((p: any, i: number) => (
-                <Avatar key={i} src={p.profile?.avatar_url} name={p.profile?.full_name} size="sm" className="border-2 border-surface" />
+                <Avatar key={i} src={p.profile?.avatar_url} name={p.profile?.full_name} size="sm" className="border-2 border-[#1C1B1C]" />
               ))}
             </div>
             <Button variant="secondary" size="sm" onClick={() => {
@@ -123,29 +123,29 @@ export default function StudyRoomPage() {
             <SessionChat sessionId={session?.id || sessionId as string} currentUser={currentUser} />
             
             {/* Shared Resources */}
-            <div className="h-28 bg-surface border border-border rounded-2xl p-4 shadow-sm shrink-0">
-              <h3 className="text-xs font-bold text-primary-dark mb-3 uppercase tracking-wider opacity-60">Shared Resources</h3>
+            <div className="h-28 bg-[#1C1B1C] border border-stone-800 rounded-2xl p-4 shadow-xl shadow-black/20 shrink-0">
+              <h3 className="text-xs font-bold text-stone-300 mb-3 uppercase tracking-wider">Shared Resources</h3>
               <div className="flex gap-4 overflow-x-auto pb-1">
                 {resources.length > 0 ? (
                   resources.map((res: any, i: number) => (
                     <div 
                       key={i} 
                       onClick={() => window.open(res.url.startsWith('http') ? res.url : `https://${res.url}`, '_blank')}
-                      className="px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-xl flex items-center gap-3 cursor-pointer hover:bg-blue-100 transition-colors shrink-0"
+                      className="px-3 py-2 bg-[#141314] border border-stone-800 rounded-xl flex items-center gap-3 cursor-pointer hover:border-[#FF553E]/50 transition-colors shrink-0"
                     >
-                      <LinkIcon size={16} className="text-primary" />
+                      <LinkIcon size={16} className="text-[#FF553E]" />
                       <div>
-                        <p className="text-[10px] font-bold text-primary truncate max-w-[100px]">{res.name}</p>
-                        <p className="text-[8px] text-gray-500">Resource</p>
+                        <p className="text-[10px] font-bold text-stone-200 truncate max-w-[100px]">{res.name}</p>
+                        <p className="text-[8px] text-stone-500">Resource</p>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-[10px] text-gray-400 italic flex items-center">No resources shared yet.</p>
+                  <p className="text-[10px] text-stone-500 italic flex items-center">No resources shared yet.</p>
                 )}
                 <button 
                   onClick={() => setIsResourceModalOpen(true)}
-                  className="px-4 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-xl flex items-center gap-2 text-gray-400 hover:border-primary/40 hover:text-primary transition-all shrink-0"
+                  className="px-4 border-2 border-dashed border-stone-800 rounded-xl flex items-center gap-2 text-stone-400 hover:border-[#FF553E]/50 hover:text-[#FF553E] transition-all shrink-0"
                 >
                   <Plus size={16} />
                   <span className="text-[10px] font-bold uppercase">Add</span>
@@ -156,36 +156,36 @@ export default function StudyRoomPage() {
 
           {/* Right Sidebar (Participants & Stats) */}
           <div className="space-y-4 flex flex-col overflow-hidden">
-            <div className="bg-surface border border-border rounded-2xl p-5 shadow-sm flex-1 flex flex-col overflow-hidden">
-              <h3 className="text-sm font-bold text-primary-dark mb-4">Participants</h3>
+            <div className="bg-[#1C1B1C] border border-stone-800 rounded-2xl p-5 shadow-xl shadow-black/20 flex-1 flex flex-col overflow-hidden">
+              <h3 className="text-sm font-serif font-bold text-stone-100 mb-4">Participants</h3>
               <div className="space-y-3 overflow-y-auto flex-1">
                 {session?.participants?.map((p: any, i: number) => (
                   <div key={i} className="flex items-center gap-3">
                     <Avatar src={p.profile?.avatar_url} name={p.profile?.full_name} size="xs" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-text-main truncate">{p.profile?.full_name}</p>
-                      <p className="text-[10px] text-text-muted truncate">{p.profile?.branch || 'Student'}</p>
+                      <p className="text-xs font-medium text-stone-200 truncate">{p.profile?.full_name}</p>
+                      <p className="text-[10px] text-stone-500 truncate">{p.profile?.branch || 'Student'}</p>
                     </div>
-                    <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-primary to-blue-700 rounded-2xl p-5 shadow-lg text-white">
+            <div className="bg-gradient-to-br from-[#1C1B1C] via-[#241A18] to-[#1F1614] border border-[#FF553E]/30 rounded-2xl p-5 shadow-xl shadow-black/30 text-white">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold opacity-90">Session Goals</h3>
+                <h3 className="text-sm font-serif font-bold text-stone-100">Session Goals</h3>
                 <button 
                   onClick={() => setIsGoalModalOpen(true)}
-                  className="text-[10px] bg-white/20 px-2 py-1 rounded-md hover:bg-white/30 transition-colors flex items-center gap-1"
+                  className="text-[10px] bg-[#FF553E]/20 border border-[#FF553E]/30 text-[#FF553E] px-2 py-1 rounded-md hover:bg-[#FF553E]/30 transition-colors flex items-center gap-1 font-semibold"
                 >
                   <Plus size={10} /> Add
                 </button>
               </div>
               <ul className="space-y-2">
                 {goals.map((goal, i) => (
-                  <li key={i} className="flex items-center gap-2 text-xs opacity-90">
-                    <span className="w-1 h-1 bg-white rounded-full"></span> 
+                  <li key={i} className="flex items-center gap-2 text-xs text-stone-300">
+                    <span className="w-1.5 h-1.5 bg-[#FF553E] rounded-full"></span> 
                     {goal}
                   </li>
                 ))}

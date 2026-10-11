@@ -13,12 +13,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased bg-background text-text-main selection:bg-primary selection:text-white">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className="font-sans antialiased bg-[#141314] text-[#F3F2F0] selection:bg-[#FF553E] selection:text-white">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          forcedTheme="dark"
           disableTransitionOnChange
         >
           {children}

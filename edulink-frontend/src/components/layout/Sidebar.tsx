@@ -34,29 +34,29 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-60 fixed left-0 top-0 bottom-0 bg-surface border-r border-border py-6 px-4 z-40">
-      <div className="flex items-center gap-2.5 mb-8 px-2">
-        <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-white shadow-sm shadow-primary/30">
+    <aside className="hidden md:flex flex-col w-60 fixed left-0 top-0 bottom-0 bg-[#1C1B1C] border-r border-stone-800 py-6 px-4 z-40">
+      <Link href="/dashboard" className="flex items-center gap-3 mb-8 px-2 group">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF553E] to-[#FFA07A] flex items-center justify-center text-white shadow-md shadow-[#FF553E]/20 transition-transform group-hover:scale-105">
           <GraduationCap size={20} />
         </div>
         <div>
-          <span className="text-lg font-bold text-text-main tracking-tight">EduLink</span>
-          <span className="block text-[10px] font-semibold text-primary uppercase tracking-wider">SRM KTR</span>
+          <span className="text-lg font-bold text-white tracking-tight">EduLink</span>
+          <span className="block text-[10px] font-semibold text-[#FF553E] uppercase tracking-wider">SRM KTR Campus</span>
         </div>
-      </div>
+      </Link>
 
       <nav className="flex-1 space-y-1.5">
         {links.map((link) => {
-          const isActive = pathname?.startsWith(link.href);
+          const isActive = pathname === link.href || (link.href !== '/dashboard' && pathname?.startsWith(link.href));
           const Icon = link.icon;
           return (
             <Link
               key={link.name}
               href={link.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive 
-                  ? 'bg-primary text-white shadow-sm shadow-primary/25 font-semibold' 
-                  : 'text-text-muted hover:bg-gray-100 dark:hover:bg-gray-800/80 hover:text-text-main'
+                  ? 'bg-[#FF553E] text-white shadow-md shadow-[#FF553E]/25 font-semibold' 
+                  : 'text-stone-400 hover:bg-stone-800/60 hover:text-white'
               }`}
             >
               <Icon size={18} />
@@ -66,15 +66,15 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="pt-5 border-t border-border mt-auto space-y-3">
-        <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-border">
-          <span className="text-xs font-medium text-text-muted">Appearance</span>
-          <ThemeToggle />
+      <div className="pt-4 border-t border-stone-800 mt-auto space-y-2.5">
+        <div className="px-3 py-2 rounded-xl bg-[#141314] border border-stone-800/80 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[11px] font-medium text-stone-400">SRM KTR Hub Live</span>
         </div>
 
         <button 
           onClick={handleSignOut}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-stone-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
         >
           <LogOut size={17} />
           Sign Out

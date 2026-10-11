@@ -7,12 +7,12 @@ interface EmptyStateProps {
   subtext: string;
 }
 
-export function EmptyState({ icon = <FolderOpen size={48} className="text-gray-300" />, heading, subtext }: EmptyStateProps) {
+export function EmptyState({ icon = <FolderOpen size={48} className="text-stone-600" />, heading, subtext }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center bg-gray-50 border border-dashed border-gray-300 rounded-2xl h-full">
+    <div className="flex flex-col items-center justify-center p-8 text-center bg-[#1C1B1C] border border-dashed border-stone-800 rounded-2xl h-full shadow-lg shadow-black/10">
       <div className="mb-4">{icon}</div>
-      <h3 className="text-lg font-semibold text-gray-900">{heading}</h3>
-      <p className="text-sm text-gray-500 mt-1 max-w-sm">{subtext}</p>
+      <h3 className="text-lg font-serif font-bold text-stone-100">{heading}</h3>
+      <p className="text-sm text-stone-400 mt-1 max-w-sm leading-relaxed">{subtext}</p>
     </div>
   );
 }

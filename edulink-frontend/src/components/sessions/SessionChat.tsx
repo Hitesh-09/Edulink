@@ -96,27 +96,27 @@ export default function SessionChat({ sessionId, currentUser }: SessionChatProps
   };
 
   return (
-    <div className="flex flex-col h-full bg-surface rounded-2xl border border-border overflow-hidden shadow-sm">
+    <div className="flex flex-col h-full bg-[#1C1B1C] rounded-2xl border border-stone-800 overflow-hidden shadow-xl shadow-black/20">
       {/* Chat Header */}
-      <div className="bg-gray-50/50 border-b border-border px-6 py-4">
+      <div className="bg-[#161516] border-b border-stone-800 px-6 py-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-bold text-primary-dark">Live Session Discussion</h3>
+          <h3 className="font-serif font-bold text-stone-100">Live Session Discussion</h3>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Live</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">Live</span>
           </div>
         </div>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white/50">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#141314]">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-10">
-            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4 text-primary">
+            <div className="w-16 h-16 bg-[#FF553E]/10 border border-[#FF553E]/20 rounded-full flex items-center justify-center mb-4 text-[#FF553E]">
               <MessageSquare size={32} />
             </div>
-            <h4 className="font-bold text-gray-900 mb-1">No messages yet</h4>
-            <p className="text-sm text-gray-500 max-w-[200px]">Start the conversation with your study group!</p>
+            <h4 className="font-serif font-bold text-stone-100 mb-1">No messages yet</h4>
+            <p className="text-sm text-stone-400 max-w-[200px]">Start the conversation with your study group!</p>
           </div>
         ) : (
           messages.map((msg, idx) => {
@@ -127,22 +127,22 @@ export default function SessionChat({ sessionId, currentUser }: SessionChatProps
                   src={msg.profiles?.avatar_url} 
                   name={msg.profiles?.full_name} 
                   size="sm" 
-                  className="shadow-sm border border-white"
+                  className="shadow-sm border border-stone-800"
                 />
                 <div className={`max-w-[80%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                   {!isMe && (
-                    <p className="text-[10px] font-bold text-gray-500 mb-1 ml-1">
+                    <p className="text-[10px] font-bold text-stone-400 mb-1 ml-1">
                       {msg.profiles?.full_name}
                     </p>
                   )}
                   <div className={`rounded-2xl px-4 py-2.5 text-sm shadow-sm transition-all hover:shadow-md ${
                     isMe 
-                      ? 'bg-primary text-white rounded-tr-none' 
-                      : 'bg-white border border-border text-gray-800 rounded-tl-none'
+                      ? 'bg-[#FF553E] text-white rounded-tr-none shadow-lg shadow-[#FF553E]/20' 
+                      : 'bg-[#1C1B1C] border border-stone-800 text-stone-100 rounded-tl-none'
                   }`}>
                     <p className="leading-relaxed">{msg.content}</p>
                   </div>
-                  <p className="text-[9px] text-gray-400 mt-1.5 px-1 font-medium">
+                  <p className="text-[9px] text-stone-500 mt-1.5 px-1 font-medium">
                     {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
@@ -154,20 +154,20 @@ export default function SessionChat({ sessionId, currentUser }: SessionChatProps
       </div>
 
       {/* Message Input */}
-      <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-border">
-        <div className="flex gap-2 bg-gray-50 p-1.5 rounded-xl border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+      <form onSubmit={handleSendMessage} className="p-4 bg-[#161516] border-t border-stone-800">
+        <div className="flex gap-2 bg-[#141314] p-1.5 rounded-xl border border-stone-800 focus-within:border-[#FF553E] focus-within:ring-1 focus-within:ring-[#FF553E]/20 transition-all">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Discuss with the group..."
-            className="flex-1 bg-transparent border-none rounded-lg px-3 py-2 text-sm outline-none focus:ring-0"
+            className="flex-1 bg-transparent border-none rounded-lg px-3 py-2 text-sm text-stone-100 placeholder:text-stone-600 outline-none focus:ring-0"
           />
           <Button 
             type="submit" 
             size="sm"
             disabled={!newMessage.trim() || isSending}
-            className="px-6 shadow-md shadow-primary/10"
+            className="px-6 shadow-md shadow-[#FF553E]/20"
           >
             {isSending ? '...' : 'Send'}
           </Button>

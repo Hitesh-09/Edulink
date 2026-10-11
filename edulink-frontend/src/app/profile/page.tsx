@@ -246,7 +246,7 @@ export default function ProfilePage() {
       )}
       
       {/* Profile Header */}
-      <div className="bg-surface rounded-2xl border border-border p-8 mb-8 shadow-sm">
+      <div className="bg-[#1C1B1C] rounded-2xl border border-stone-800 p-8 mb-8 shadow-xl shadow-black/20">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
           <div 
             className={`relative group ${isEditing ? 'cursor-pointer' : ''}`}
@@ -256,11 +256,11 @@ export default function ProfilePage() {
               src={profile?.avatar_url} 
               name={profile?.full_name} 
               size="lg" 
-              className={`w-32 h-32 text-4xl border-4 ${isEditing ? 'border-primary group-hover:opacity-75 transition-opacity' : 'border-white'}`}
+              className={`w-32 h-32 text-4xl border-4 ${isEditing ? 'border-[#FF553E] group-hover:opacity-75 transition-opacity' : 'border-stone-800'}`}
             />
             {isEditing && (
               <div className="absolute inset-0 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <span className="bg-black/50 p-2 rounded-full text-xs font-bold">Change</span>
+                <span className="bg-black/60 p-2 rounded-full text-xs font-bold">Change</span>
               </div>
             )}
             <input 
@@ -275,25 +275,28 @@ export default function ProfilePage() {
           <div className="flex-1 text-center md:text-left space-y-2">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-primary-dark">{profile?.full_name}</h1>
+                <h1 className="text-3xl font-serif font-bold text-stone-100">{profile?.full_name}</h1>
                 {profile?.register_no && (
-                  <p className="text-sm font-semibold text-primary font-mono tracking-wider mt-0.5">
+                  <p className="text-sm font-semibold text-[#FF553E] font-mono tracking-wider mt-0.5">
                     Reg No: {profile.register_no}
                   </p>
                 )}
-                <p className="text-base text-gray-600 dark:text-gray-300">
+                <p className="text-base text-stone-300 mt-1">
                   {profile?.college || 'SRM Institute of Science and Technology'} • Campus: {profile?.campus || 'KTR'}
                 </p>
-                <p className="text-sm text-gray-500 font-medium uppercase tracking-wide">
+                <p className="text-xs text-stone-400 font-semibold uppercase tracking-wider mt-1">
                   {profile?.degree} • {profile?.branch} • Year {profile?.year} (Semester {profile?.semester || (profile?.year ? (profile.year - 1) * 2 + 1 : 1)})
                 </p>
               </div>
               <div className="flex justify-center md:justify-end gap-3">
                 {!isEditing ? (
                   <>
-                    <Button variant="secondary" className="text-red-600 border-red-200 hover:bg-red-50" onClick={handleSignOut}>
+                    <button 
+                      className="px-4 py-2 rounded-xl text-xs font-semibold text-red-400 border border-red-800/60 bg-red-950/30 hover:bg-red-900/40 transition-colors" 
+                      onClick={handleSignOut}
+                    >
                       Sign Out
-                    </Button>
+                    </button>
                     <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
                   </>
                 ) : (
@@ -318,36 +321,36 @@ export default function ProfilePage() {
       {/* Info Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Academic Info */}
-        <div className="bg-surface rounded-2xl border border-border p-8 shadow-sm">
-          <h2 className="text-xl font-bold text-primary-dark mb-6">Academic Details</h2>
+        <div className="bg-[#1C1B1C] rounded-2xl border border-stone-800 p-8 shadow-xl shadow-black/20">
+          <h2 className="text-xl font-serif font-bold text-stone-100 mb-6">Academic Details</h2>
           <div className="space-y-6">
             {!isEditing ? (
               <div className="grid grid-cols-2 gap-y-6">
                 <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase">Degree</p>
-                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-medium">{profile?.degree}</p>
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider">Degree</p>
+                  <p className="text-base text-stone-200 mt-1 font-medium">{profile?.degree}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase">Year & Semester</p>
-                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-medium">
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider">Year & Semester</p>
+                  <p className="text-base text-stone-200 mt-1 font-medium">
                     Year {profile?.year} • Sem {profile?.semester || (profile?.year ? (profile.year - 1) * 2 + 1 : 1)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase">Register Number</p>
-                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-mono font-medium">{profile?.register_no || 'Not set'}</p>
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider">Register Number</p>
+                  <p className="text-base text-[#FF553E] mt-1 font-mono font-medium">{profile?.register_no || 'Not set'}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase">Campus</p>
-                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-medium">{profile?.campus || 'KTR'}</p>
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider">Campus</p>
+                  <p className="text-base text-stone-200 mt-1 font-medium">{profile?.campus || 'KTR'}</p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-xs font-medium text-gray-500 uppercase">Department / Branch</p>
-                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-medium">{profile?.branch}</p>
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider">Department / Branch</p>
+                  <p className="text-base text-stone-200 mt-1 font-medium">{profile?.branch}</p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-xs font-medium text-gray-500 uppercase">College</p>
-                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-medium">{profile?.college || 'SRM Institute of Science and Technology'}</p>
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider">College</p>
+                  <p className="text-base text-stone-200 mt-1 font-medium">{profile?.college || 'SRM Institute of Science and Technology'}</p>
                 </div>
               </div>
             ) : (
@@ -365,24 +368,24 @@ export default function ProfilePage() {
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Degree</label>
+                    <label className="text-xs font-semibold text-stone-300">Degree</label>
                     <select 
-                      className="border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary bg-surface text-text-main"
+                      className="border border-stone-800 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E] bg-[#141314] text-stone-200"
                       value={formData.degree}
                       onChange={(e) => setFormData({...formData, degree: e.target.value})}
                     >
-                      <option value="B.Tech">B.Tech</option>
-                      <option value="B.Sc">B.Sc</option>
-                      <option value="BCA">BCA</option>
-                      <option value="MCA">MCA</option>
-                      <option value="M.Tech">M.Tech</option>
-                      <option value="MBA">MBA</option>
+                      <option value="B.Tech" className="bg-[#1C1B1C]">B.Tech</option>
+                      <option value="B.Sc" className="bg-[#1C1B1C]">B.Sc</option>
+                      <option value="BCA" className="bg-[#1C1B1C]">BCA</option>
+                      <option value="MCA" className="bg-[#1C1B1C]">MCA</option>
+                      <option value="M.Tech" className="bg-[#1C1B1C]">M.Tech</option>
+                      <option value="MBA" className="bg-[#1C1B1C]">MBA</option>
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Year</label>
+                    <label className="text-xs font-semibold text-stone-300">Year</label>
                     <select 
-                      className="border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary bg-surface text-text-main"
+                      className="border border-stone-800 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E] bg-[#141314] text-stone-200"
                       value={formData.year}
                       onChange={(e) => {
                         const yr = parseInt(e.target.value);
@@ -393,53 +396,53 @@ export default function ProfilePage() {
                         });
                       }}
                     >
-                      {[1,2,3,4].map(y => <option key={y} value={y}>{y}st/nd/rd/th Year</option>)}
+                      {[1,2,3,4].map(y => <option key={y} value={y} className="bg-[#1C1B1C]">{y}st/nd/rd/th Year</option>)}
                     </select>
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Semester</label>
+                  <label className="text-xs font-semibold text-stone-300">Semester</label>
                   <select
                     value={formData.semester}
                     onChange={(e) => setFormData({ ...formData, semester: parseInt(e.target.value) })}
-                    className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-text-main"
+                    className="w-full border border-stone-800 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E] outline-none bg-[#141314] text-stone-200"
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
-                      <option key={s} value={s}>Semester {s}</option>
+                      <option key={s} value={s} className="bg-[#1C1B1C]">Semester {s}</option>
                     ))}
                   </select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Department / Branch</label>
+                  <label className="text-xs font-semibold text-stone-300">Department / Branch</label>
                   <select
                     value={formData.branch}
                     onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                    className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-text-main"
+                    className="w-full border border-stone-800 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E] outline-none bg-[#141314] text-stone-200"
                   >
-                    <option value="" disabled>Select your branch</option>
-                    <option value="CSE Core">CSE Core</option>
-                    <option value="CSE (AI & Machine Learning)">CSE (AI & Machine Learning)</option>
-                    <option value="CSE (Data Science)">CSE (Data Science)</option>
-                    <option value="CSE (Cyber Security)">CSE (Cyber Security)</option>
-                    <option value="CSE (Cloud Computing)">CSE (Cloud Computing)</option>
-                    <option value="Information Technology (IT)">Information Technology (IT)</option>
-                    <option value="Electronics & Communication (ECE)">Electronics & Communication (ECE)</option>
-                    <option value="Electrical & Electronics (EEE)">Electrical & Electronics (EEE)</option>
-                    <option value="Mechanical Engineering">Mechanical Engineering</option>
-                    <option value="Civil Engineering">Civil Engineering</option>
-                    <option value="Biotechnology">Biotechnology</option>
-                    <option value="Aerospace Engineering">Aerospace Engineering</option>
+                    <option value="" disabled className="bg-[#1C1B1C]">Select your branch</option>
+                    <option value="CSE Core" className="bg-[#1C1B1C]">CSE Core</option>
+                    <option value="CSE (AI & Machine Learning)" className="bg-[#1C1B1C]">CSE (AI & Machine Learning)</option>
+                    <option value="CSE (Data Science)" className="bg-[#1C1B1C]">CSE (Data Science)</option>
+                    <option value="CSE (Cyber Security)" className="bg-[#1C1B1C]">CSE (Cyber Security)</option>
+                    <option value="CSE (Cloud Computing)" className="bg-[#1C1B1C]">CSE (Cloud Computing)</option>
+                    <option value="Information Technology (IT)" className="bg-[#1C1B1C]">Information Technology (IT)</option>
+                    <option value="Electronics & Communication (ECE)" className="bg-[#1C1B1C]">Electronics & Communication (ECE)</option>
+                    <option value="Electrical & Electronics (EEE)" className="bg-[#1C1B1C]">Electrical & Electronics (EEE)</option>
+                    <option value="Mechanical Engineering" className="bg-[#1C1B1C]">Mechanical Engineering</option>
+                    <option value="Civil Engineering" className="bg-[#1C1B1C]">Civil Engineering</option>
+                    <option value="Biotechnology" className="bg-[#1C1B1C]">Biotechnology</option>
+                    <option value="Aerospace Engineering" className="bg-[#1C1B1C]">Aerospace Engineering</option>
                   </select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-gray-700">College</label>
+                  <label className="text-xs font-semibold text-stone-300">College</label>
                   <select
                     value={formData.college}
                     onChange={(e) => setFormData({ ...formData, college: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white font-medium"
+                    className="w-full border border-stone-800 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E] outline-none bg-[#141314] text-stone-200 font-medium"
                   >
-                    <option value="" disabled>Select your college</option>
-                    <option value="SRM Institute of Science and Technology">SRM Institute of Science and Technology</option>
+                    <option value="" disabled className="bg-[#1C1B1C]">Select your college</option>
+                    <option value="SRM Institute of Science and Technology" className="bg-[#1C1B1C]">SRM Institute of Science and Technology</option>
                   </select>
                 </div>
               </div>
@@ -448,14 +451,14 @@ export default function ProfilePage() {
         </div>
 
         {/* Interests */}
-        <div className="bg-surface rounded-2xl border border-border p-8 shadow-sm">
-          <h2 className="text-xl font-bold text-primary-dark mb-6">Study Interests</h2>
+        <div className="bg-[#1C1B1C] rounded-2xl border border-stone-800 p-8 shadow-xl shadow-black/20">
+          <h2 className="text-xl font-serif font-bold text-stone-100 mb-6">Study Interests</h2>
           <div className="flex flex-wrap gap-2">
             {!isEditing ? (
               profile?.interests?.map((interest: any) => (
                 <span 
                   key={interest.id || interest} 
-                  className="px-4 py-2 bg-purple-50 text-purple-700 border border-purple-100 rounded-full text-sm font-medium"
+                  className="px-4 py-2 bg-[#FF553E]/10 text-[#FF553E] border border-[#FF553E]/20 rounded-full text-sm font-semibold"
                 >
                   {interest.name || interest}
                 </span>
@@ -469,8 +472,8 @@ export default function ProfilePage() {
                     onClick={() => toggleInterest(interest)}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
                       isSelected 
-                        ? 'bg-purple-100 border-purple-300 text-purple-700 shadow-inner' 
-                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                        ? 'bg-[#FF553E]/20 border-[#FF553E]/50 text-[#FF553E]' 
+                        : 'bg-[#141314] border-stone-800 text-stone-400 hover:bg-stone-800 hover:text-stone-200'
                     }`}
                   >
                     {interest}

@@ -128,7 +128,7 @@ export default function DiscoverPage() {
         </div>
 
         {/* Filter Sidebar */}
-        <div className={`w-full md:w-64 shrink-0 bg-surface border border-border rounded-2xl p-5 ${showFilters ? 'block' : 'hidden md:block'}`}>
+        <div className={`w-full md:w-64 shrink-0 bg-[#1C1B1C] border border-stone-800 rounded-2xl p-5 shadow-xl shadow-black/20 ${showFilters ? 'block' : 'hidden md:block'}`}>
           <div className="hidden md:block mb-6">
             <Input 
               placeholder="Search by name..." 
@@ -140,17 +140,17 @@ export default function DiscoverPage() {
           <div className="space-y-6">
             {/* Interests Filter */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-3">Interests</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-stone-300 mb-3">Interests</h4>
               <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
                 {AVAILABLE_INTERESTS.map(interest => (
-                  <label key={interest} className="flex items-center gap-2 cursor-pointer">
+                  <label key={interest} className="flex items-center gap-2 cursor-pointer group">
                     <input 
                       type="checkbox" 
-                      className="rounded text-primary focus:ring-primary border-gray-300"
+                      className="rounded accent-[#FF553E] border-stone-700 bg-[#141314]"
                       checked={selectedInterests.includes(interest)}
                       onChange={() => toggleInterest(interest)}
                     />
-                    <span className="text-sm text-gray-700">{interest}</span>
+                    <span className="text-sm text-stone-400 group-hover:text-stone-200 transition-colors">{interest}</span>
                   </label>
                 ))}
               </div>
@@ -158,17 +158,17 @@ export default function DiscoverPage() {
 
             {/* Year Filter */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-3">Year</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-stone-300 mb-3">Year</h4>
               <div className="space-y-2">
                 {YEARS.map(year => (
-                  <label key={year} className="flex items-center gap-2 cursor-pointer">
+                  <label key={year} className="flex items-center gap-2 cursor-pointer group">
                     <input 
                       type="checkbox" 
-                      className="rounded text-primary focus:ring-primary border-gray-300"
+                      className="rounded accent-[#FF553E] border-stone-700 bg-[#141314]"
                       checked={selectedYears.includes(year)}
                       onChange={() => toggleYear(year)}
                     />
-                    <span className="text-sm text-gray-700">{year} Year</span>
+                    <span className="text-sm text-stone-400 group-hover:text-stone-200 transition-colors">{year} Year</span>
                   </label>
                 ))}
               </div>
@@ -176,43 +176,43 @@ export default function DiscoverPage() {
 
             {/* Degree Filter */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">Degree</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-stone-300 mb-2">Degree</h4>
               <select 
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary bg-white"
+                className="w-full border border-stone-800 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E] bg-[#141314] text-stone-200"
                 value={degreeFilter}
                 onChange={(e) => setDegreeFilter(e.target.value)}
               >
-                <option value="">All Degrees</option>
-                <option value="B.Tech">B.Tech</option>
-                <option value="B.Sc">B.Sc</option>
-                <option value="BCA">BCA</option>
-                <option value="MCA">MCA</option>
-                <option value="M.Tech">M.Tech</option>
-                <option value="MBA">MBA</option>
+                <option value="" className="bg-[#1C1B1C]">All Degrees</option>
+                <option value="B.Tech" className="bg-[#1C1B1C]">B.Tech</option>
+                <option value="B.Sc" className="bg-[#1C1B1C]">B.Sc</option>
+                <option value="BCA" className="bg-[#1C1B1C]">BCA</option>
+                <option value="MCA" className="bg-[#1C1B1C]">MCA</option>
+                <option value="M.Tech" className="bg-[#1C1B1C]">M.Tech</option>
+                <option value="MBA" className="bg-[#1C1B1C]">MBA</option>
               </select>
             </div>
 
             {/* Branch Filter */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">Branch</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-stone-300 mb-2">Branch</h4>
               <select
                 value={branchFilter}
                 onChange={(e) => setBranchFilter(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
+                className="w-full border border-stone-800 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#FF553E] focus:border-[#FF553E] bg-[#141314] text-stone-200"
               >
-                <option value="">All Branches</option>
-                <option value="CSE Core">CSE Core</option>
-                <option value="CSE AIML">CSE AIML</option>
-                <option value="CSE Software">CSE Software</option>
-                <option value="CSE Cybersecurity">CSE Cybersecurity</option>
-                <option value="CSE IT">CSE IT</option>
-                <option value="CSE DS">CSE DS</option>
+                <option value="" className="bg-[#1C1B1C]">All Branches</option>
+                <option value="CSE Core" className="bg-[#1C1B1C]">CSE Core</option>
+                <option value="CSE AIML" className="bg-[#1C1B1C]">CSE AIML</option>
+                <option value="CSE Software" className="bg-[#1C1B1C]">CSE Software</option>
+                <option value="CSE Cybersecurity" className="bg-[#1C1B1C]">CSE Cybersecurity</option>
+                <option value="CSE IT" className="bg-[#1C1B1C]">CSE IT</option>
+                <option value="CSE DS" className="bg-[#1C1B1C]">CSE DS</option>
               </select>
             </div>
 
-            <div className="pt-4 border-t border-border flex flex-col gap-2">
+            <div className="pt-4 border-t border-stone-800/80 flex flex-col gap-2">
               <Button onClick={handleApplyFilters} className="w-full">Apply Filters</Button>
-              <Button variant="ghost" onClick={handleClearFilters} className="w-full">Clear All</Button>
+              <Button variant="ghost" onClick={handleClearFilters} className="w-full text-stone-400 hover:text-stone-200">Clear All</Button>
             </div>
           </div>
         </div>
@@ -237,7 +237,7 @@ export default function DiscoverPage() {
           ) : (
             <div className="mt-10">
               <EmptyState 
-                icon={<SearchIcon size={48} className="text-gray-300" />}
+                icon={<SearchIcon size={48} className="text-stone-600" />}
                 heading="No students found"
                 subtext="We couldn't find any students matching your filters. Try adjusting your search criteria."
               />

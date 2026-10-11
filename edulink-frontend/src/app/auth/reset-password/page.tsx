@@ -68,13 +68,13 @@ export default function ResetPasswordPage() {
 
   if (hasValidSession === false) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="w-full max-w-md bg-surface p-8 rounded-2xl shadow-sm border border-border text-center space-y-4">
-          <div className="w-12 h-12 bg-red-100 text-error rounded-full flex items-center justify-center mx-auto">
+      <div className="min-h-screen flex items-center justify-center bg-[#141314] px-4">
+        <div className="w-full max-w-md bg-[#1C1B1C] p-8 rounded-2xl shadow-2xl border border-stone-800 text-center space-y-4">
+          <div className="w-12 h-12 bg-red-950/40 text-red-400 border border-red-800/60 rounded-full flex items-center justify-center mx-auto">
             <Lock className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-text-main">Invalid or Expired Link</h2>
-          <p className="text-sm text-text-muted">
+          <h2 className="text-xl font-serif font-bold text-stone-100">Invalid or Expired Link</h2>
+          <p className="text-sm text-stone-400 leading-relaxed">
             This password reset link is invalid or has expired. Please request a new password reset link.
           </p>
           <div className="pt-4">
@@ -88,32 +88,32 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md bg-surface p-8 rounded-2xl shadow-sm border border-border">
+    <div className="min-h-screen flex items-center justify-center bg-[#141314] px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md bg-[#1C1B1C] p-8 rounded-2xl shadow-2xl border border-stone-800">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 bg-[#FF553E]/10 text-[#FF553E] border border-[#FF553E]/20 rounded-full flex items-center justify-center mx-auto mb-3">
             <Lock className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-text-main tracking-tight">Set New Password</h1>
-          <p className="text-sm text-text-muted mt-2">
+          <h1 className="text-2xl font-serif font-bold text-stone-100 tracking-tight">Set New Password</h1>
+          <p className="text-sm text-stone-400 mt-2">
             Please enter and confirm your new password below.
           </p>
         </div>
 
         {isSuccess ? (
           <div className="text-center space-y-4 py-4 animate-in fade-in duration-300">
-            <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 bg-emerald-950/50 text-emerald-400 border border-emerald-800/60 rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-6 h-6" />
             </div>
-            <h2 className="text-lg font-bold text-text-main">Password Updated!</h2>
-            <p className="text-sm text-text-muted">
+            <h2 className="text-lg font-serif font-bold text-stone-100">Password Updated!</h2>
+            <p className="text-sm text-stone-400">
               Your password has been reset successfully. Redirecting you to your dashboard...
             </p>
           </div>
         ) : (
           <form onSubmit={handleResetPassword} className="space-y-4">
             {error && (
-              <div className="text-sm text-error bg-red-50 dark:bg-red-950/30 p-3 rounded-lg border border-red-200 dark:border-red-900/50">
+              <div className="text-sm text-red-400 bg-red-950/40 p-3 rounded-xl border border-red-800/60">
                 {error}
               </div>
             )}
@@ -130,7 +130,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="hover:text-text-main transition-colors focus:outline-none"
+                  className="hover:text-stone-200 text-stone-500 transition-colors focus:outline-none"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -150,7 +150,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="hover:text-text-main transition-colors focus:outline-none"
+                  className="hover:text-stone-200 text-stone-500 transition-colors focus:outline-none"
                   aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                 >
                   {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

@@ -22,16 +22,16 @@ export function MobileTabBar() {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-border pb-safe flex justify-around px-2 py-2 z-50">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1C1B1C] border-t border-stone-800 pb-safe flex justify-around px-2 py-2 z-50">
       {links.map((link) => {
-        const isActive = pathname?.startsWith(link.href);
+        const isActive = pathname === link.href || (link.href !== '/dashboard' && pathname?.startsWith(link.href));
         const Icon = link.icon;
         return (
           <Link
             key={link.name}
             href={link.href}
             className={`flex flex-col items-center justify-center w-16 p-1 gap-1 rounded-lg transition-colors ${
-              isActive ? 'text-primary font-semibold' : 'text-text-muted hover:text-text-main'
+              isActive ? 'text-[#FF553E] font-semibold' : 'text-stone-400 hover:text-white'
             }`}
           >
             <Icon size={20} />
