@@ -52,12 +52,22 @@ const getUserInsights = async (userId) => {
         .or(`user_a.eq.${userId},user_b.eq.${userId}`);
     if (connectionsError)
         throw appError("Failed to fetch connections count");
+    const hours = Math.floor(totalStudyMinutes / 60);
+    const mins = totalStudyMinutes % 60;
+    const totalTimeString = hours > 0 ? `${hours}h${mins > 0 ? ` ${mins}m` : ''}` : `${mins}m`;
+    const countSessions = sessionsAttended ?? 0;
+    const countConnections = connectionsCount ?? 0;
     return {
         totalStudyMinutes,
+        totalTime: totalTimeString,
         dailyStreak,
-        sessionsAttended: sessionsAttended ?? 0,
+        streak: `${dailyStreak} Days`,
+        studyStreak: dailyStreak,
+        sessionsAttended: countSessions,
+        totalSessions: countSessions,
         weeklyMinutes,
-        connectionsCount: connectionsCount ?? 0,
+        connectionsCount: countConnections,
+        activeConnections: countConnections,
     };
 };
 exports.getUserInsights = getUserInsights;

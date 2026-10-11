@@ -12,7 +12,8 @@ const listUsers = async (userId, filters) => {
     let query = supabase_1.supabase
         .from("profiles")
         .select("*, profile_interests(interest_id, interests(id, name))")
-        .neq("id", userId);
+        .neq("id", userId)
+        .eq("is_complete", true);
     if (filters.year)
         query = query.eq("year", filters.year);
     if (filters.degree)

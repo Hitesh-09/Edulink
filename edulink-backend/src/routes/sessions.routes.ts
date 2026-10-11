@@ -3,6 +3,7 @@ import {
   createStudySession,
   deleteStudySession,
   getStudySessions,
+  getStudySessionById,
   updateStudySession,
 } from "../controllers/sessions.controller";
 
@@ -10,6 +11,7 @@ const router = Router();
 
 router.post("/", createStudySession);
 router.get("/", getStudySessions);
+router.get("/:id", getStudySessionById);
 router.put("/:id", updateStudySession);
 router.delete("/:id", deleteStudySession);
 

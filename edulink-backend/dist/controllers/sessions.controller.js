@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteStudySession = exports.updateStudySession = exports.getStudySessions = exports.createStudySession = void 0;
+exports.deleteStudySession = exports.updateStudySession = exports.getStudySessionById = exports.getStudySessions = exports.createStudySession = void 0;
 const sessions_service_1 = require("../services/sessions.service");
 /** Creates a study session for caller and connected participants. */
 const createStudySession = async (req, res, next) => {
@@ -42,6 +42,20 @@ const getStudySessions = async (req, res, next) => {
     }
 };
 exports.getStudySessions = getStudySessions;
+/** Returns a single study session with participants. */
+const getStudySessionById = async (req, res, next) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId)
+            return void res.status(401).json({ error: "Unauthorized" });
+        const result = await (0, sessions_service_1.getSessionById)(req.params.id, userId);
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getStudySessionById = getStudySessionById;
 /** Updates a session if caller is the creator. */
 const updateStudySession = async (req, res, next) => {
     try {

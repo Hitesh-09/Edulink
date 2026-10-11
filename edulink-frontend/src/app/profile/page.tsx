@@ -35,10 +35,13 @@ export default function ProfilePage() {
   const [insights, setInsights] = useState<any>(null);
   const [formData, setFormData] = useState<any>({
     fullName: '',
-    college: '',
+    registerNo: '',
+    college: 'SRM Institute of Science and Technology',
+    campus: 'KTR',
     degree: 'B.Tech',
     branch: '',
     year: 1,
+    semester: 1,
     interests: [] as string[],
     avatarUrl: ''
   });
@@ -66,10 +69,13 @@ export default function ProfilePage() {
       
       setFormData({
         fullName: actualProfile?.full_name || actualProfile?.fullName || '',
-        college: actualProfile?.college || actualProfile?.college || 'SRM Institute of Science and Technology',
+        registerNo: actualProfile?.register_no || '',
+        college: actualProfile?.college || 'SRM Institute of Science and Technology',
+        campus: actualProfile?.campus || 'KTR',
         degree: actualProfile?.degree || 'B.Tech',
         branch: actualProfile?.branch || '',
         year: actualProfile?.year || 1,
+        semester: actualProfile?.semester || (actualProfile?.year ? (actualProfile.year - 1) * 2 + 1 : 1),
         interests: (actualProfile?.interests || []).map((i: any) => i.name || i),
         avatarUrl: actualProfile?.avatar_url || actualProfile?.avatarUrl || ''
       });
@@ -94,10 +100,13 @@ export default function ProfilePage() {
       setError(null);
       const payload = {
         full_name: formData.fullName || pData.full_name || pData.fullName,
-        college: formData.college || pData.college,
-        degree: formData.degree || pData.degree,
+        register_no: (formData.registerNo || pData.register_no || '').trim().toUpperCase(),
+        college: 'SRM Institute of Science and Technology',
+        campus: 'KTR',
+        degree: formData.degree || pData.degree || 'B.Tech',
         branch: formData.branch || pData.branch,
         year: Number(formData.year) || Number(pData.year) || 1,
+        semester: Number(formData.semester) || Number(pData.semester) || ((Number(formData.year) || 1) - 1) * 2 + 1,
         interests: formData.interests?.length > 0 ? formData.interests : pData.interests || [],
         avatar_url: formData.avatarUrl || pData.avatar_url || pData.avatarUrl
       };
@@ -105,8 +114,6 @@ export default function ProfilePage() {
       // PRE-FLIGHT CHECK: Specific field validation
       const missingFields = [];
       if (!payload.full_name) missingFields.push("Full Name");
-      if (!payload.college) missingFields.push("College");
-      if (!payload.degree) missingFields.push("Degree");
       if (!payload.branch) missingFields.push("Branch");
       if (!payload.year) missingFields.push("Year");
 
@@ -269,9 +276,16 @@ export default function ProfilePage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-primary-dark">{profile?.full_name}</h1>
-                <p className="text-lg text-gray-600">{profile?.college}</p>
+                {profile?.register_no && (
+                  <p className="text-sm font-semibold text-primary font-mono tracking-wider mt-0.5">
+                    Reg No: {profile.register_no}
+                  </p>
+                )}
+                <p className="text-base text-gray-600 dark:text-gray-300">
+                  {profile?.college || 'SRM Institute of Science and Technology'} • Campus: {profile?.campus || 'KTR'}
+                </p>
                 <p className="text-sm text-gray-500 font-medium uppercase tracking-wide">
-                  {profile?.degree} • {profile?.branch} • Year {profile?.year}
+                  {profile?.degree} • {profile?.branch} • Year {profile?.year} (Semester {profile?.semester || (profile?.year ? (profile.year - 1) * 2 + 1 : 1)})
                 </p>
               </div>
               <div className="flex justify-center md:justify-end gap-3">
@@ -311,19 +325,29 @@ export default function ProfilePage() {
               <div className="grid grid-cols-2 gap-y-6">
                 <div>
                   <p className="text-xs font-medium text-gray-500 uppercase">Degree</p>
-                  <p className="text-base text-gray-900 mt-1 font-medium">{profile?.degree}</p>
+                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-medium">{profile?.degree}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase">Year</p>
-                  <p className="text-base text-gray-900 mt-1 font-medium">{profile?.year}</p>
+                  <p className="text-xs font-medium text-gray-500 uppercase">Year & Semester</p>
+                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-medium">
+                    Year {profile?.year} • Sem {profile?.semester || (profile?.year ? (profile.year - 1) * 2 + 1 : 1)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500 uppercase">Register Number</p>
+                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-mono font-medium">{profile?.register_no || 'Not set'}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500 uppercase">Campus</p>
+                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-medium">{profile?.campus || 'KTR'}</p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-xs font-medium text-gray-500 uppercase">Branch</p>
-                  <p className="text-base text-gray-900 mt-1 font-medium">{profile?.branch}</p>
+                  <p className="text-xs font-medium text-gray-500 uppercase">Department / Branch</p>
+                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-medium">{profile?.branch}</p>
                 </div>
                 <div className="col-span-2">
                   <p className="text-xs font-medium text-gray-500 uppercase">College</p>
-                  <p className="text-base text-gray-900 mt-1 font-medium">{profile?.college}</p>
+                  <p className="text-base text-gray-900 dark:text-gray-100 mt-1 font-medium">{profile?.college || 'SRM Institute of Science and Technology'}</p>
                 </div>
               </div>
             ) : (
@@ -333,11 +357,17 @@ export default function ProfilePage() {
                   value={formData.fullName} 
                   onChange={(e) => setFormData({...formData, fullName: e.target.value})}
                 />
+                <Input 
+                  label="Register Number" 
+                  value={formData.registerNo} 
+                  placeholder="e.g. RA2211003010000"
+                  onChange={(e) => setFormData({...formData, registerNo: e.target.value.toUpperCase()})}
+                />
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-gray-700">Degree</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Degree</label>
                     <select 
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary bg-white"
+                      className="border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary bg-surface text-text-main"
                       value={formData.degree}
                       onChange={(e) => setFormData({...formData, degree: e.target.value})}
                     >
@@ -350,30 +380,55 @@ export default function ProfilePage() {
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-gray-700">Year</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Year</label>
                     <select 
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary bg-white"
+                      className="border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary bg-surface text-text-main"
                       value={formData.year}
-                      onChange={(e) => setFormData({...formData, year: parseInt(e.target.value)})}
+                      onChange={(e) => {
+                        const yr = parseInt(e.target.value);
+                        setFormData({
+                          ...formData,
+                          year: yr,
+                          semester: (yr - 1) * 2 + 1
+                        });
+                      }}
                     >
-                      {[1,2,3,4,5].map(y => <option key={y} value={y}>{y}</option>)}
+                      {[1,2,3,4].map(y => <option key={y} value={y}>{y}st/nd/rd/th Year</option>)}
                     </select>
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-gray-700">Branch</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Semester</label>
+                  <select
+                    value={formData.semester}
+                    onChange={(e) => setFormData({ ...formData, semester: parseInt(e.target.value) })}
+                    className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-text-main"
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+                      <option key={s} value={s}>Semester {s}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Department / Branch</label>
                   <select
                     value={formData.branch}
                     onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
+                    className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-text-main"
                   >
                     <option value="" disabled>Select your branch</option>
                     <option value="CSE Core">CSE Core</option>
-                    <option value="CSE AIML">CSE AIML</option>
-                    <option value="CSE Software">CSE Software</option>
-                    <option value="CSE Cybersecurity">CSE Cybersecurity</option>
-                    <option value="CSE IT">CSE IT</option>
-                    <option value="CSE DS">CSE DS</option>
+                    <option value="CSE (AI & Machine Learning)">CSE (AI & Machine Learning)</option>
+                    <option value="CSE (Data Science)">CSE (Data Science)</option>
+                    <option value="CSE (Cyber Security)">CSE (Cyber Security)</option>
+                    <option value="CSE (Cloud Computing)">CSE (Cloud Computing)</option>
+                    <option value="Information Technology (IT)">Information Technology (IT)</option>
+                    <option value="Electronics & Communication (ECE)">Electronics & Communication (ECE)</option>
+                    <option value="Electrical & Electronics (EEE)">Electrical & Electronics (EEE)</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    <option value="Civil Engineering">Civil Engineering</option>
+                    <option value="Biotechnology">Biotechnology</option>
+                    <option value="Aerospace Engineering">Aerospace Engineering</option>
                   </select>
                 </div>
                 <div className="flex flex-col gap-1.5">

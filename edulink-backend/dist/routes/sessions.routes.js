@@ -5,6 +5,7 @@ const sessions_controller_1 = require("../controllers/sessions.controller");
 const router = (0, express_1.Router)();
 router.post("/", sessions_controller_1.createStudySession);
 router.get("/", sessions_controller_1.getStudySessions);
+router.get("/:id", sessions_controller_1.getStudySessionById);
 router.put("/:id", sessions_controller_1.updateStudySession);
 router.delete("/:id", sessions_controller_1.deleteStudySession);
 exports.default = router;

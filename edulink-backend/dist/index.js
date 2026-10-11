@@ -19,7 +19,12 @@ const app = (0, express_1.default)();
 const port = process.env.PORT || 3001;
 app.use((0, helmet_1.default)());
 app.use((0, cors_1.default)({
-    origin: ['https://edulink-one.vercel.app', process.env.FRONTEND_URL].filter(Boolean),
+    origin: [
+        'https://edulink-one.vercel.app',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        process.env.FRONTEND_URL,
+    ].filter(Boolean),
     credentials: true,
 }));
 app.use(express_1.default.json());

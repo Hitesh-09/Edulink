@@ -159,3 +159,26 @@ export const deleteSession = async (sessionId: string, userId: string): Promise<
   const { error } = await supabase.from("study_sessions").delete().eq("id", sessionId);
   if (error) throw appError("Failed to delete session");
 };
+
+/** Fetches a single study session by ID with enrolled participants and their profiles. */
+export const getSessionById = async (sessionId: string, _userId: string) => {
+  const { data: session, error: sessionError } = await supabase
+    .from("study_sessions")
+    .select("*")
+    .eq("id", sessionId)
+    .single();
+
+  if (sessionError || !session) throw appError("Session not found", 404);
+
+  const { data: participants, error: participantError } = await supabase
+    .from("session_participants")
+    .select("*, profile:profiles(*)")
+    .eq("session_id", sessionId);
+
+  if (participantError) throw appError("Failed to fetch session participants");
+
+  return {
+    ...session,
+    participants: participants ?? [],
+  };
+};

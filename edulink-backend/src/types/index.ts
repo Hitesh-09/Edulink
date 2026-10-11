@@ -1,10 +1,14 @@
 export interface Profile {
   id: string;
   full_name: string;
+  register_no?: string;
   college: string;
+  campus: string;
   degree: string;
   branch: string;
   year: number;
+  semester: number;
+  avatar_url?: string;
   is_complete: boolean;
   created_at?: string;
   updated_at?: string;
@@ -60,10 +64,15 @@ export interface StudyLog {
 
 export interface InsightsResponse {
   totalStudyMinutes: number;
+  totalTime: string;
   dailyStreak: number;
+  streak: string;
+  studyStreak: number;
   sessionsAttended: number;
+  totalSessions: number;
   weeklyMinutes: number[];
   connectionsCount: number;
+  activeConnections: number;
 }
 
 export interface AuthUser {

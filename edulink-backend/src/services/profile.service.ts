@@ -54,7 +54,7 @@ export const upsertOwnProfile = async (
   });
 
   if (upsertError) {
-    throw appError("Failed to update profile");
+    throw appError(`Failed to update profile: ${upsertError.message}`);
   }
 
   if (Array.isArray(interests)) {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteSession = exports.updateSession = exports.listSessions = exports.createSession = void 0;
+exports.getSessionById = exports.deleteSession = exports.updateSession = exports.listSessions = exports.createSession = void 0;
 const supabase_1 = require("../lib/supabase");
 const appError = (message, status = 500) => {
     const error = new Error(message);
@@ -140,3 +140,24 @@ const deleteSession = async (sessionId, userId) => {
         throw appError("Failed to delete session");
 };
 exports.deleteSession = deleteSession;
+/** Fetches a single study session by ID with enrolled participants and their profiles. */
+const getSessionById = async (sessionId, _userId) => {
+    const { data: session, error: sessionError } = await supabase_1.supabase
+        .from("study_sessions")
+        .select("*")
+        .eq("id", sessionId)
+        .single();
+    if (sessionError || !session)
+        throw appError("Session not found", 404);
+    const { data: participants, error: participantError } = await supabase_1.supabase
+        .from("session_participants")
+        .select("*, profile:profiles(*)")
+        .eq("session_id", sessionId);
+    if (participantError)
+        throw appError("Failed to fetch session participants");
+    return {
+        ...session,
+        participants: participants ?? [],
+    };
+};
+exports.getSessionById = getSessionById;

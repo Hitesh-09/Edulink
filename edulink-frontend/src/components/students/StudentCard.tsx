@@ -4,9 +4,12 @@ import { Button } from '@/components/ui/Button';
 export interface StudentProfile {
   id: string;
   full_name: string;
+  register_no?: string;
   college: string;
+  campus?: string;
   branch: string;
-  year: string;
+  year: string | number;
+  semester?: number;
   interests: string[];
   avatar_url?: string;
 }
@@ -25,6 +28,7 @@ export function StudentCard({ profile, connectionStatus, onConnect }: StudentCar
 
   const displayedInterests = profile.interests?.slice(0, 3) || [];
   const extraInterests = (profile.interests?.length || 0) - 3;
+  const semNum = profile.semester || (Number(profile.year) ? (Number(profile.year) - 1) * 2 + 1 : 1);
 
   return (
     <div className="bg-surface rounded-2xl shadow-sm border border-border p-5 flex flex-col h-full transition-shadow hover:shadow-md">
@@ -36,18 +40,21 @@ export function StudentCard({ profile, connectionStatus, onConnect }: StudentCar
             getInitials(profile.full_name)
           )}
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <h3 className="font-semibold text-primary-dark line-clamp-1">{profile.full_name}</h3>
-          <p className="text-xs text-gray-500 line-clamp-1">{profile.college}</p>
+          {profile.register_no && (
+            <p className="text-[11px] font-mono font-medium text-primary tracking-wider">{profile.register_no}</p>
+          )}
+          <p className="text-xs text-gray-500 line-clamp-1">{profile.college} ({profile.campus || 'KTR'})</p>
         </div>
       </div>
 
       <div className="mb-5 flex-1">
         <div className="flex items-center gap-2 mb-3">
-          <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
-            {profile.year} Year
+          <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+            Year {profile.year} • Sem {semNum}
           </div>
-          <p className="text-xs text-gray-700 line-clamp-1"><span className="font-medium">Branch:</span> {profile.branch}</p>
+          <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-1"><span className="font-medium">Branch:</span> {profile.branch}</p>
         </div>
         
         <div className="flex flex-wrap gap-1.5">

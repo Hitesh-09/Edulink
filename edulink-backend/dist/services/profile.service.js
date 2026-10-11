@@ -42,7 +42,7 @@ const upsertOwnProfile = async (userId, payload) => {
         is_complete: true,
     });
     if (upsertError) {
-        throw appError("Failed to update profile");
+        throw appError(`Failed to update profile: ${upsertError.message}`);
     }
     if (Array.isArray(interests)) {
         const { error: deleteError } = await supabase_1.supabase

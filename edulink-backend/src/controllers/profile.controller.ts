@@ -28,20 +28,38 @@ export const updateProfile = async (
       return;
     }
 
-    const { full_name, college, degree, branch, year, interests } = req.body;
-    if (!full_name || !college || !degree || !branch || !year) {
+    const {
+      full_name,
+      register_no,
+      college = "SRM Institute of Science and Technology",
+      campus = "KTR",
+      degree = "B.Tech",
+      branch,
+      year,
+      semester,
+      avatar_url,
+      interests,
+    } = req.body;
+
+    if (!full_name || !branch || !year) {
       res.status(400).json({
-        error: "full_name, college, degree, branch, and year are required",
+        error: "full_name, branch, and year are required",
       });
       return;
     }
 
+    const calculatedSemester = semester ? Number(semester) : ((Number(year) - 1) * 2 + 1);
+
     const result = await upsertOwnProfile(userId, {
       full_name,
+      register_no: register_no ? String(register_no).trim().toUpperCase() : undefined,
       college,
+      campus: campus || "KTR",
       degree,
       branch,
       year: Number(year),
+      semester: calculatedSemester,
+      avatar_url,
       interests,
     });
 
