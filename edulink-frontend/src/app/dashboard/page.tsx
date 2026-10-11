@@ -1,29 +1,36 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { StatCard } from '@/components/insights/StatCard';
-import { SkeletonCard } from '@/components/ui/SkeletonCard';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Button } from '@/components/ui/Button';
-import { apiFetch } from '@/lib/api';
-
-import { Clock, Zap, BookOpen, Users, Calendar, Hand } from 'lucide-react';
+import { 
+  BookOpen, 
+  HelpCircle, 
+  UploadCloud, 
+  ArrowRight, 
+  GraduationCap, 
+  Sparkles,
+  FileText,
+  ThumbsUp,
+  Download,
+  MessageSquare,
+  CheckCircle2
+} from 'lucide-react';
+import { getResources, getDoubts, ResourceItem, DoubtItem } from '@/lib/api';
 
 export default function DashboardPage() {
   const router = useRouter();
   const supabase = createClientComponentClient();
-  
-  const [userName, setUserName] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [insights, setInsights] = useState<any>(null);
-  const [sessions, setSessions] = useState<any[]>([]);
+
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [recentResources, setRecentResources] = useState<ResourceItem[]>([]);
+  const [recentDoubts, setRecentDoubts] = useState<DoubtItem[]>([]);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchDashboard = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
@@ -31,173 +38,302 @@ export default function DashboardPage() {
           return;
         }
 
-        // Check if profile is complete
-        const { data: profile } = await supabase
+        const { data: userProfile } = await supabase
           .from('profiles')
-          .select('full_name, is_complete')
+          .select('*')
           .eq('id', user.id)
           .maybeSingle();
 
-        if (profile && profile.is_complete === false) {
+        if (userProfile && userProfile.is_complete === false) {
           router.push('/profile-setup');
           return;
         }
 
-        if (profile?.full_name) {
-          setUserName(profile.full_name);
-        } else if (user.user_metadata?.full_name) {
-          setUserName(user.user_metadata.full_name);
-        } else {
-          setUserName('Student');
-        }
+        setProfile(userProfile || { full_name: 'Student', campus: 'KTR' });
 
-        // Wrap in try-catch blocks to fallback to placeholder data if the backend isn't fully ready
+        // Load recommended resources & doubts
         try {
-          const fetchedInsights = await apiFetch<any>('/api/insights');
-          setInsights(fetchedInsights);
-        } catch (e) {
-          setInsights({
-            totalTime: '24h',
-            streak: '3 Days',
-            sessionsAttended: 8,
-            activeConnections: 5
-          });
+          const [resData, doubtData] = await Promise.all([
+            getResources({
+              semester: userProfile?.semester || undefined,
+              limit: 4,
+              sortBy: 'popular',
+            }),
+            getDoubts({
+              limit: 4,
+              sortBy: 'recent',
+            }),
+          ]);
+          setRecentResources(resData.resources || []);
+          setRecentDoubts(doubtData.doubts || []);
+        } catch (fetchErr) {
+          console.error('Failed to load feed:', fetchErr);
         }
-
-        try {
-          const fetchedSessions = await apiFetch<any[]>('/api/sessions');
-          setSessions(fetchedSessions || []);
-        } catch (e) {
-          setSessions([]); // Fallback to empty to trigger the EmptyState UI
-        }
-
       } catch (err) {
-        console.error('Failed to fetch dashboard data:', err);
+        console.error('Dashboard error:', err);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchDashboardData();
-  }, [supabase]);
+    fetchDashboard();
+  }, [router, supabase]);
 
   const currentDate = new Date().toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric'
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
   });
 
   return (
     <AppLayout>
-      <PageHeader 
-        title={`Good morning, ${userName}`} 
-        subtitle={currentDate}
-        action={
-          <div className="flex gap-3 mt-4 sm:mt-0">
-            <Button variant="secondary" onClick={() => router.push('/discover')}>
-              Discover Students
-            </Button>
-            <Button onClick={() => router.push('/sessions')}>
-              Schedule Session
-            </Button>
-          </div>
-        }
-      />
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        {isLoading ? (
-          Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-        ) : (
-          <>
-            <StatCard label="Total Study Time" value={insights?.totalTime || '0h'} trend="up" icon={<Clock size={20} />} />
-            <StatCard label="Daily Streak" value={insights?.streak || '0 Days'} trend="up" icon={<Zap size={20} />} />
-            <StatCard label="Sessions Attended" value={insights?.sessionsAttended || 0} trend="neutral" icon={<BookOpen size={20} />} />
-            <StatCard label="Active Connections" value={insights?.activeConnections || 0} trend="up" icon={<Users size={20} />} />
-          </>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Recent Activity */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-surface rounded-2xl shadow-sm border border-border p-6 h-full">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h2>
-            
-            {isLoading ? (
-              <div className="space-y-4">
-                <SkeletonCard />
-                <SkeletonCard />
+      <div className="max-w-7xl mx-auto pb-12 space-y-8">
+        {/* Welcome SRM Hero Banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary via-primary-dark to-slate-900 text-white p-6 md:p-8 shadow-lg shadow-primary/10">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md">
+                  <GraduationCap size={14} />
+                  SRMIST Kattankulathur (KTR)
+                </span>
+                {profile?.register_no && (
+                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-white/10 text-white/90">
+                    {profile.register_no}
+                  </span>
+                )}
               </div>
-            ) : (
-              <div className="space-y-4">
-                {/* Dummy activity feed items for layout display purposes */}
-                <div className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-0">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-accent">
-                    <Hand size={18} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Connected with Hitesh Shimpi</p>
-                    <p className="text-xs text-gray-500">2 hours ago</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-0">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-primary">
-                    <Calendar size={18} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Joined &quot;Data Structures 101&quot; session</p>
-                    <p className="text-xs text-gray-500">Yesterday at 4:00 PM</p>
-                  </div>
-                </div>
-              </div>
-            )}
+
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+                Welcome back, {profile?.full_name || 'Student'}!
+              </h1>
+              <p className="text-sm text-white/80 mt-1 max-w-xl">
+                {profile?.branch ? `${profile.branch} • Semester ${profile.semester || 1}` : currentDate}
+                {' — '} Access curated lecture notes, PYQs, and solve doubts with your peers.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 flex-wrap">
+              <Link
+                href="/resources"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-slate-900 font-bold text-xs hover:bg-white/90 transition-all shadow-sm"
+              >
+                <BookOpen size={16} />
+                <span>Browse Notes</span>
+              </Link>
+              <Link
+                href="/doubts"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/20 backdrop-blur-md text-white font-semibold text-xs transition-all border border-white/20"
+              >
+                <HelpCircle size={16} />
+                <span>Ask a Doubt</span>
+              </Link>
+            </div>
           </div>
         </div>
 
-        {/* Upcoming Sessions */}
-        <div className="space-y-6">
-          <div className="bg-surface rounded-2xl shadow-sm border border-border p-6 h-full">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Upcoming Sessions</h2>
-            
-            {isLoading ? (
-              <div className="space-y-4">
-                <SkeletonCard />
+        {/* Quick Highlights Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <Link
+            href="/resources?sortBy=popular"
+            className="group bg-surface border border-border hover:border-primary/40 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-center gap-4"
+          >
+            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+              <BookOpen size={24} />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-text-muted">Academic Library</p>
+              <h3 className="text-sm font-bold text-text-main group-hover:text-primary transition-colors">
+                Notes & Exam Papers
+              </h3>
+            </div>
+          </Link>
+
+          <Link
+            href="/doubts?status=unresolved"
+            className="group bg-surface border border-border hover:border-primary/40 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-center gap-4"
+          >
+            <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+              <HelpCircle size={24} />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-text-muted">Community Doubts</p>
+              <h3 className="text-sm font-bold text-text-main group-hover:text-primary transition-colors">
+                Unresolved Questions
+              </h3>
+            </div>
+          </Link>
+
+          <Link
+            href="/resources"
+            className="group bg-surface border border-border hover:border-primary/40 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-center gap-4"
+          >
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+              <UploadCloud size={24} />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-text-muted">Share Materials</p>
+              <h3 className="text-sm font-bold text-text-main group-hover:text-primary transition-colors">
+                Upload for SRMites
+              </h3>
+            </div>
+          </Link>
+        </div>
+
+        {/* 2-Column Content Feed */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Popular Notes for Current Semester */}
+          <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                    <FileText size={18} />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-text-main">Popular Study Materials</h2>
+                    <p className="text-xs text-text-muted">Top notes & PYQs for Semester {profile?.semester || 1}</p>
+                  </div>
+                </div>
+                <Link
+                  href="/resources"
+                  className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+                >
+                  View All <ArrowRight size={13} />
+                </Link>
               </div>
-            ) : sessions.filter(s => new Date(s.scheduled_at) > new Date()).length > 0 ? (
-              <div className="space-y-4">
-                {sessions
-                  .filter(s => new Date(s.scheduled_at) > new Date())
-                  .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
-                  .slice(0, 3)
-                  .map((session, i) => (
-                    <div 
-                      key={i} 
-                      onClick={() => router.push(`/sessions/${session.id}/room`)}
-                      className="p-4 rounded-xl border border-border bg-gray-50 transition-colors hover:bg-gray-100 cursor-pointer"
+
+              {recentResources.length > 0 ? (
+                <div className="space-y-3">
+                  {recentResources.map((res) => (
+                    <div
+                      key={res.id}
+                      onClick={() => window.open(res.file_url, '_blank')}
+                      className="p-3.5 rounded-xl border border-border hover:border-primary/40 bg-gray-50/50 dark:bg-gray-800/30 transition-all cursor-pointer flex items-center justify-between gap-3 group"
                     >
-                      <h3 className="font-medium text-primary-dark truncate">{session.group_name || 'Untitled Session'}</h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {session.scheduled_at ? new Date(session.scheduled_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Date TBD'}
-                      </p>
-                      <div className="mt-3 flex items-center justify-between">
-                        <span className="text-xs font-medium bg-blue-100 text-primary px-2.5 py-1 rounded-full">
-                          {session.participants?.length || 0} participants
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary uppercase">
+                            {res.resource_type}
+                          </span>
+                          <span className="text-xs text-text-muted truncate">{res.subject_name}</span>
+                        </div>
+                        <h4 className="text-xs font-bold text-text-main truncate group-hover:text-primary transition-colors">
+                          {res.title}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-xs text-text-muted shrink-0">
+                        <span className="flex items-center gap-1">
+                          <ThumbsUp size={12} />
+                          {res.upvotes_count || 0}
                         </span>
-                        <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Join Room →</span>
+                        <span className="flex items-center gap-1 text-primary font-medium">
+                          <Download size={12} />
+                          {res.downloads_count || 0}
+                        </span>
                       </div>
                     </div>
                   ))}
+                </div>
+              ) : (
+                <div className="py-12 text-center text-xs text-text-muted">
+                  No materials uploaded for this semester yet.{' '}
+                  <Link href="/resources" className="text-primary font-semibold hover:underline">
+                    Be the first!
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-border">
+              <Link
+                href="/resources"
+                className="w-full py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-text-main font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <span>Browse All SRM Notes & PYQs</span>
+                <ArrowRight size={13} />
+              </Link>
+            </div>
+          </div>
+
+          {/* Active Community Doubts */}
+          <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                    <HelpCircle size={18} />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-text-main">Recent Subject Doubts</h2>
+                    <p className="text-xs text-text-muted">Questions asked by SRM students</p>
+                  </div>
+                </div>
+                <Link
+                  href="/doubts"
+                  className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+                >
+                  View All <ArrowRight size={13} />
+                </Link>
               </div>
-            ) : (
-              <EmptyState 
-                icon={<Calendar size={48} className="text-gray-300" />} 
-                heading="No Upcoming Sessions" 
-                subtext="You don't have any study sessions scheduled yet."
-              />
-            )}
+
+              {recentDoubts.length > 0 ? (
+                <div className="space-y-3">
+                  {recentDoubts.map((doubt) => (
+                    <Link
+                      key={doubt.id}
+                      href={`/doubts/${doubt.id}`}
+                      className="p-3.5 rounded-xl border border-border hover:border-primary/40 bg-gray-50/50 dark:bg-gray-800/30 transition-all flex items-center justify-between gap-3 group"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[10px] font-semibold text-text-muted bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-md">
+                            {doubt.subject_name}
+                          </span>
+                          {doubt.is_resolved ? (
+                            <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5">
+                              <CheckCircle2 size={11} /> Resolved
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold text-amber-600">Open</span>
+                          )}
+                        </div>
+                        <h4 className="text-xs font-bold text-text-main truncate group-hover:text-primary transition-colors">
+                          {doubt.title}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs text-text-muted shrink-0">
+                        <span className="flex items-center gap-1 font-medium text-text-main">
+                          <MessageSquare size={12} />
+                          {doubt.answers_count || 0}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-12 text-center text-xs text-text-muted">
+                  No active doubts right now.{' '}
+                  <Link href="/doubts" className="text-primary font-semibold hover:underline">
+                    Got a question? Ask here!
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-border">
+              <Link
+                href="/doubts"
+                className="w-full py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-text-main font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <span>Go to Doubts & Discussion Forum</span>
+                <ArrowRight size={13} />
+              </Link>
+            </div>
           </div>
         </div>
-
       </div>
     </AppLayout>
   );

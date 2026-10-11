@@ -1,0 +1,14 @@
+{
+  "name": "edulink",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SRM Edulink Academic Resource Hub & Doubts Forum",
+  "scripts": {
+    "dev": "node dev.js",
+    "dev:backend": "npm --prefix edulink-backend run dev",
+    "dev:frontend": "npm --prefix edulink-frontend run dev",
+    "build:backend": "npm --prefix edulink-backend run build",
+    "build:frontend": "npm --prefix edulink-frontend run build",
+    "build": "npm run build:backend && npm run build:frontend"
+  }
+}

@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, 
-  Search, 
-  Users, 
-  Calendar, 
+  BookOpen, 
+  HelpCircle, 
+  MessageSquare, 
   User 
 } from 'lucide-react';
 
@@ -15,9 +15,9 @@ export function MobileTabBar() {
 
   const links = [
     { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Discover', href: '/discover', icon: Search },
-    { name: 'Network', href: '/connections', icon: Users },
-    { name: 'Sessions', href: '/sessions', icon: Calendar },
+    { name: 'Resources', href: '/resources', icon: BookOpen },
+    { name: 'Doubts', href: '/doubts', icon: HelpCircle },
+    { name: 'Chat', href: '/messages', icon: MessageSquare },
     { name: 'Profile', href: '/profile', icon: User },
   ];
 
@@ -31,7 +31,7 @@ export function MobileTabBar() {
             key={link.name}
             href={link.href}
             className={`flex flex-col items-center justify-center w-16 p-1 gap-1 rounded-lg transition-colors ${
-              isActive ? 'text-primary' : 'text-text-muted hover:text-text-main'
+              isActive ? 'text-primary font-semibold' : 'text-text-muted hover:text-text-main'
             }`}
           >
             <Icon size={20} />

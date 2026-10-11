@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabase";
-import { Interest, Profile } from "../types";
+import { Profile } from "../types";
 
 const appError = (message: string, status = 500): Error & { status: number } => {
   const error = new Error(message) as Error & { status: number };
@@ -7,10 +7,10 @@ const appError = (message: string, status = 500): Error & { status: number } => 
   return error;
 };
 
-/** Fetches a profile and all linked interests by user ID. */
+/** Fetches a profile by user ID. */
 export const getProfileById = async (
   userId: string
-): Promise<{ profile: Profile; interests: Interest[] }> => {
+): Promise<{ profile: Profile; interests?: any[] }> => {
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("*")
@@ -21,99 +21,27 @@ export const getProfileById = async (
     throw appError("Profile not found", 404);
   }
 
-  const { data: profileInterests, error: interestsError } = await supabase
-    .from("profile_interests")
-    .select("interests(id, name)")
-    .eq("profile_id", userId);
-
-  if (interestsError) {
-    throw appError("Failed to fetch profile interests");
-  }
-
-  const interests =
-    profileInterests
-      ?.map((row) => {
-        const nested = row.interests as Interest | Interest[] | null;
-        return Array.isArray(nested) ? nested[0] : nested;
-      })
-      .filter((item): item is Interest => Boolean(item)) ?? [];
-
-  return { profile: profile as Profile, interests };
+  return { profile: profile as Profile, interests: [] };
 };
 
-/** Upserts profile data and replaces interests for the given user ID. */
+/** Upserts profile data for the given user ID. */
 export const upsertOwnProfile = async (
   userId: string,
   payload: Omit<Profile, "id" | "is_complete"> & { interests?: string[] },
   userEmail?: string
-): Promise<{ profile: Profile; interests: Interest[] }> => {
-  // Defensive: ensure user exists in public.users to satisfy profiles_id_fkey
-  try {
-    let emailToUse = userEmail;
-    if (!emailToUse) {
-      const { data: authUserData } = await supabase.auth.admin.getUserById(userId);
-      emailToUse = authUserData?.user?.email;
-    }
-
-    if (emailToUse) {
-      const { error: userError } = await supabase.from("users").upsert(
-        {
-          id: userId,
-          email: emailToUse,
-        },
-        { onConflict: "id" }
-      );
-      if (userError) {
-        console.warn("[upsertOwnProfile] Defensive public.users upsert warning:", userError.message);
-      }
-    }
-  } catch (err) {
-    console.warn("[upsertOwnProfile] Could not defensively upsert public.users:", err);
-  }
-
+): Promise<{ profile: Profile; interests?: any[] }> => {
   const { interests, ...profileFields } = payload;
   const { error: upsertError } = await supabase.from("profiles").upsert({
     id: userId,
     ...profileFields,
     is_complete: true,
+    updated_at: new Date().toISOString(),
   });
 
   if (upsertError) {
     throw appError(`Failed to update profile: ${upsertError.message}`);
   }
 
-  if (Array.isArray(interests)) {
-    const { error: deleteError } = await supabase
-      .from("profile_interests")
-      .delete()
-      .eq("profile_id", userId);
-
-    if (deleteError) {
-      throw appError("Failed to reset profile interests");
-    }
-
-    if (interests.length > 0) {
-      const { data: matchedInterests, error: fetchError } = await supabase
-        .from("interests")
-        .select("id")
-        .in("name", interests);
-
-      if (fetchError || !matchedInterests) {
-        throw appError("Failed to resolve interest IDs");
-      }
-
-      const { error: insertError } = await supabase.from("profile_interests").insert(
-        matchedInterests.map((interest) => ({
-          profile_id: userId,
-          interest_id: interest.id,
-        }))
-      );
-
-      if (insertError) {
-        throw appError("Failed to save profile interests");
-      }
-    }
-  }
-
   return getProfileById(userId);
 };
+

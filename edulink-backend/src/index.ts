@@ -7,8 +7,10 @@ import helmet from "helmet";
 import { authMiddleware } from "./middleware/auth";
 import { errorHandler } from "./middleware/errorHandler";
 import connectionsRoutes from "./routes/connections.routes";
+import doubtsRoutes from "./routes/doubts.routes";
 import insightsRoutes from "./routes/insights.routes";
 import profileRoutes from "./routes/profile.routes";
+import resourcesRoutes from "./routes/resources.routes";
 import sessionsRoutes from "./routes/sessions.routes";
 import usersRoutes from "./routes/users.routes";
 
@@ -35,6 +37,8 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/profile", authMiddleware, profileRoutes);
+app.use("/api/resources", authMiddleware, resourcesRoutes);
+app.use("/api/doubts", authMiddleware, doubtsRoutes);
 app.use("/api/users", authMiddleware, usersRoutes);
 app.use("/api/connections", authMiddleware, connectionsRoutes);
 app.use("/api/sessions", authMiddleware, sessionsRoutes);

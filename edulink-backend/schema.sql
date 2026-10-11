@@ -1,149 +1,31 @@
 -- ==========================================================
--- EDULINK COMPLETE SUPABASE DATABASE SCHEMA
--- Run this in the Supabase Dashboard -> SQL Editor
+-- EDULINK SRM (KTR) COMPLETE DATABASE SCHEMA
 -- ==========================================================
 
 -- 1. EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. USERS TABLE (Links Supabase auth.users to public schema)
-CREATE TABLE IF NOT EXISTS public.users (
-  id UUID NOT NULL PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email TEXT NOT NULL UNIQUE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- 3. PROFILES TABLE
+-- 2. PROFILES TABLE (Directly linked to auth.users)
 CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID NOT NULL PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name TEXT NOT NULL DEFAULT '',
-  register_no TEXT,
+  register_no TEXT UNIQUE,
   college TEXT DEFAULT 'SRM Institute of Science and Technology',
   campus TEXT DEFAULT 'KTR',
   degree TEXT DEFAULT 'B.Tech',
   branch TEXT,
-  year INTEGER,
-  semester INTEGER DEFAULT 1,
+  year INTEGER CHECK (year >= 1 AND year <= 5),
+  semester INTEGER CHECK (semester >= 1 AND semester <= 10) DEFAULT 1,
   avatar_url TEXT,
   is_complete BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Idempotent migrations for existing installations
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS register_no TEXT;
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS campus TEXT DEFAULT 'KTR';
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS semester INTEGER DEFAULT 1;
-
--- 3. INTERESTS TABLE
-CREATE TABLE IF NOT EXISTS public.interests (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT UNIQUE NOT NULL
-);
-
--- Seed default interests
-INSERT INTO public.interests (name) VALUES
-  ('DSA'),
-  ('Web Dev'),
-  ('AI/ML'),
-  ('Cybersecurity'),
-  ('Mobile Dev'),
-  ('DevOps'),
-  ('Data Science'),
-  ('UI/UX')
-ON CONFLICT (name) DO NOTHING;
-
--- 4. PROFILE INTERESTS JUNCTION
-CREATE TABLE IF NOT EXISTS public.profile_interests (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  interest_id UUID NOT NULL REFERENCES public.interests(id) ON DELETE CASCADE,
-  UNIQUE(profile_id, interest_id)
-);
-
--- 5. CONNECTION REQUESTS TABLE
-CREATE TABLE IF NOT EXISTS public.connection_requests (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  sender_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  receiver_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  status TEXT NOT NULL CHECK (status IN ('pending', 'accepted', 'rejected')) DEFAULT 'pending',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- 6. CONNECTIONS TABLE
-CREATE TABLE IF NOT EXISTS public.connections (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_a UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  user_b UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE(user_a, user_b)
-);
-
--- 7. STUDY SESSIONS TABLE
-CREATE TABLE IF NOT EXISTS public.study_sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  creator_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  group_name TEXT NOT NULL,
-  description TEXT,
-  scheduled_at TIMESTAMPTZ NOT NULL,
-  duration_minutes INTEGER NOT NULL,
-  status TEXT NOT NULL CHECK (status IN ('upcoming', 'completed', 'cancelled')) DEFAULT 'upcoming',
-  goals JSONB DEFAULT '[]'::jsonB,
-  resources JSONB DEFAULT '[]'::jsonB,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- 8. SESSION PARTICIPANTS TABLE
-CREATE TABLE IF NOT EXISTS public.session_participants (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID NOT NULL REFERENCES public.study_sessions(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE(session_id, user_id)
-);
-
--- 9. STUDY LOGS TABLE
-CREATE TABLE IF NOT EXISTS public.study_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  duration_minutes INTEGER NOT NULL DEFAULT 0,
-  study_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- 10. REALTIME SESSION MESSAGES TABLE
-CREATE TABLE IF NOT EXISTS public.session_messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID NOT NULL REFERENCES public.study_sessions(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  content TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- 11. DIRECT 1-ON-1 MESSAGES TABLE
-CREATE TABLE IF NOT EXISTS public.direct_messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  sender_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  receiver_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  content TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- ==========================================================
--- AUTOMATIC USER & PROFILE TRIGGER ON SIGNUP
--- ==========================================================
+-- 3. AUTOMATIC PROFILE TRIGGER ON SIGNUP
 CREATE OR REPLACE FUNCTION public.handle_new_auth_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- 1. Insert into public.users first to satisfy foreign key constraints
-  INSERT INTO public.users (id, email, created_at)
-  VALUES (NEW.id, NEW.email, NEW.created_at)
-  ON CONFLICT (id) DO UPDATE
-    SET email = EXCLUDED.email;
-
-  -- 2. Insert stub profile into public.profiles
   INSERT INTO public.profiles (id, full_name, is_complete)
   VALUES (
     NEW.id,
@@ -151,7 +33,6 @@ BEGIN
     FALSE
   )
   ON CONFLICT (id) DO NOTHING;
-
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -161,94 +42,164 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_auth_user();
 
--- ==========================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
--- ==========================================================
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.interests ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.profile_interests ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.connection_requests ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.connections ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.study_sessions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.session_participants ENABLE ROW LEVEL SECURITY;
-
--- Users: Read for authenticated, insert/update own
-DROP POLICY IF EXISTS "Users read policy" ON public.users;
-CREATE POLICY "Users read policy" ON public.users FOR SELECT TO authenticated USING (true);
-
-DROP POLICY IF EXISTS "Users update policy" ON public.users;
-CREATE POLICY "Users update policy" ON public.users FOR UPDATE TO authenticated USING (auth.uid() = id);
-ALTER TABLE public.study_logs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.session_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.direct_messages ENABLE ROW LEVEL SECURITY;
-
--- Interests: Anyone authenticated can read
-DROP POLICY IF EXISTS "Interests read policy" ON public.interests;
-CREATE POLICY "Interests read policy" ON public.interests FOR SELECT TO authenticated USING (true);
-
--- Profiles: Anyone authenticated can read profiles; owners can update their own
-DROP POLICY IF EXISTS "Profiles read policy" ON public.profiles;
-CREATE POLICY "Profiles read policy" ON public.profiles FOR SELECT TO authenticated USING (true);
-
-DROP POLICY IF EXISTS "Profiles update policy" ON public.profiles;
-CREATE POLICY "Profiles update policy" ON public.profiles FOR UPDATE TO authenticated USING (auth.uid() = id);
-
-DROP POLICY IF EXISTS "Profiles insert policy" ON public.profiles;
-CREATE POLICY "Profiles insert policy" ON public.profiles FOR INSERT TO authenticated WITH CHECK (auth.uid() = id);
-
--- Profile Interests: Anyone authenticated can view; owner can modify
-DROP POLICY IF EXISTS "Profile interests select" ON public.profile_interests;
-CREATE POLICY "Profile interests select" ON public.profile_interests FOR SELECT TO authenticated USING (true);
-
-DROP POLICY IF EXISTS "Profile interests insert" ON public.profile_interests;
-CREATE POLICY "Profile interests insert" ON public.profile_interests FOR ALL TO authenticated USING (auth.uid() = profile_id);
-
--- Session messages: Anyone in the session can view and post
-DROP POLICY IF EXISTS "Session messages select" ON public.session_messages;
-CREATE POLICY "Session messages select" ON public.session_messages FOR SELECT TO authenticated USING (true);
-
-DROP POLICY IF EXISTS "Session messages insert" ON public.session_messages;
-CREATE POLICY "Session messages insert" ON public.session_messages FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
-
--- Direct messages: Senders and receivers can view and send
-DROP POLICY IF EXISTS "Direct messages select" ON public.direct_messages;
-CREATE POLICY "Direct messages select" ON public.direct_messages FOR SELECT TO authenticated
-  USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
-
-DROP POLICY IF EXISTS "Direct messages insert" ON public.direct_messages;
-CREATE POLICY "Direct messages insert" ON public.direct_messages FOR INSERT TO authenticated
-  WITH CHECK (auth.uid() = sender_id);
-
--- ==========================================================
--- ENABLE REALTIME FOR CHAT TABLES
--- ==========================================================
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables 
-    WHERE pubname = 'supabase_realtime' AND tablename = 'session_messages'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.session_messages;
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables 
-    WHERE pubname = 'supabase_realtime' AND tablename = 'direct_messages'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.direct_messages;
-  END IF;
-END $$;
-
--- ==========================================================
--- BACKFILL EXISTING AUTH USERS INTO USERS & PROFILES
--- ==========================================================
-INSERT INTO public.users (id, email, created_at)
-SELECT id, email, created_at FROM auth.users
-ON CONFLICT (id) DO NOTHING;
-
+-- Backfill existing auth users
 INSERT INTO public.profiles (id, full_name, is_complete)
 SELECT id, COALESCE(raw_user_meta_data->>'full_name', ''), FALSE
 FROM auth.users
 ON CONFLICT (id) DO NOTHING;
 
+-- 4. RESOURCES TABLE (StuDocu-Style Academic Library)
+CREATE TABLE IF NOT EXISTS public.resources (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT,
+  resource_type TEXT NOT NULL CHECK (resource_type IN ('notes', 'pyq', 'lab_manual', 'book', 'assignment', 'syllabus')),
+  subject_name TEXT NOT NULL,
+  subject_code TEXT,
+  department TEXT NOT NULL,
+  year INTEGER NOT NULL CHECK (year BETWEEN 1 AND 5),
+  semester INTEGER NOT NULL CHECK (semester BETWEEN 1 AND 10),
+  file_url TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  file_size BIGINT DEFAULT 0,
+  file_type TEXT DEFAULT 'pdf',
+  uploaded_by UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  upvotes_count INTEGER DEFAULT 0,
+  downloads_count INTEGER DEFAULT 0,
+  views_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_resources_dept_sem ON public.resources(department, semester);
+CREATE INDEX IF NOT EXISTS idx_resources_subject ON public.resources(subject_name);
+CREATE INDEX IF NOT EXISTS idx_resources_type ON public.resources(resource_type);
+
+-- 5. RESOURCE INTERACTIONS (Upvotes & Bookmarks)
+CREATE TABLE IF NOT EXISTS public.resource_upvotes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  resource_id UUID NOT NULL REFERENCES public.resources(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(resource_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.resource_bookmarks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  resource_id UUID NOT NULL REFERENCES public.resources(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(resource_id, user_id)
+);
+
+-- 6. DOUBTS & COMMUNITY QUESTIONS
+CREATE TABLE IF NOT EXISTS public.doubts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  subject_name TEXT NOT NULL,
+  department TEXT,
+  year INTEGER,
+  semester INTEGER,
+  tags TEXT[] DEFAULT '{}',
+  author_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  is_resolved BOOLEAN DEFAULT FALSE,
+  upvotes_count INTEGER DEFAULT 0,
+  answers_count INTEGER DEFAULT 0,
+  views_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_doubts_dept_sem ON public.doubts(department, semester);
+CREATE INDEX IF NOT EXISTS idx_doubts_subject ON public.doubts(subject_name);
+
+-- 7. DOUBT ANSWERS
+CREATE TABLE IF NOT EXISTS public.doubt_answers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  doubt_id UUID NOT NULL REFERENCES public.doubts(id) ON DELETE CASCADE,
+  author_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  is_accepted BOOLEAN DEFAULT FALSE,
+  upvotes_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 8. DOUBT & ANSWER UPVOTES
+CREATE TABLE IF NOT EXISTS public.doubt_upvotes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  doubt_id UUID NOT NULL REFERENCES public.doubts(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  UNIQUE(doubt_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.answer_upvotes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  answer_id UUID NOT NULL REFERENCES public.doubt_answers(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  UNIQUE(answer_id, user_id)
+);
+
+-- 9. DIRECT MESSAGES (1-on-1 Student Chat)
+CREATE TABLE IF NOT EXISTS public.direct_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  receiver_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 10. ROW LEVEL SECURITY (RLS) POLICIES
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.resources ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.resource_upvotes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.resource_bookmarks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.doubts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.doubt_answers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.doubt_upvotes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.answer_upvotes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.direct_messages ENABLE ROW LEVEL SECURITY;
+
+-- Profiles: Authenticated users can read profiles; owners can update
+CREATE POLICY "Profiles select" ON public.profiles FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Profiles update" ON public.profiles FOR UPDATE TO authenticated USING (auth.uid() = id);
+
+-- Resources
+CREATE POLICY "Resources select" ON public.resources FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Resources insert" ON public.resources FOR INSERT TO authenticated WITH CHECK (auth.uid() = uploaded_by);
+CREATE POLICY "Resources update" ON public.resources FOR UPDATE TO authenticated USING (auth.uid() = uploaded_by);
+CREATE POLICY "Resources delete" ON public.resources FOR DELETE TO authenticated USING (auth.uid() = uploaded_by);
+
+-- Resource Upvotes & Bookmarks
+CREATE POLICY "Resource upvotes all" ON public.resource_upvotes FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Resource bookmarks all" ON public.resource_bookmarks FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- Doubts
+CREATE POLICY "Doubts select" ON public.doubts FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Doubts insert" ON public.doubts FOR INSERT TO authenticated WITH CHECK (auth.uid() = author_id);
+CREATE POLICY "Doubts update" ON public.doubts FOR UPDATE TO authenticated USING (auth.uid() = author_id);
+
+-- Doubt Answers
+CREATE POLICY "Doubt answers select" ON public.doubt_answers FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Doubt answers insert" ON public.doubt_answers FOR INSERT TO authenticated WITH CHECK (auth.uid() = author_id);
+CREATE POLICY "Doubt answers update" ON public.doubt_answers FOR UPDATE TO authenticated USING (auth.uid() = author_id);
+
+-- Doubt & Answer Upvotes
+CREATE POLICY "Doubt upvotes all" ON public.doubt_upvotes FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Answer upvotes all" ON public.answer_upvotes FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- Direct Messages
+CREATE POLICY "Direct messages select" ON public.direct_messages FOR SELECT TO authenticated USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+CREATE POLICY "Direct messages insert" ON public.direct_messages FOR INSERT TO authenticated WITH CHECK (auth.uid() = sender_id);
+
+-- 11. STORAGE BUCKET FOR RESOURCES
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('resources', 'resources', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Public Resource Access" ON storage.objects;
+CREATE POLICY "Public Resource Access" ON storage.objects FOR SELECT TO authenticated, anon USING (bucket_id = 'resources');
+
+DROP POLICY IF EXISTS "Authenticated Resource Upload" ON storage.objects;
+CREATE POLICY "Authenticated Resource Upload" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'resources');

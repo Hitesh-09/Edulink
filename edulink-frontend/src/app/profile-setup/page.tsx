@@ -31,6 +31,7 @@ export default function ProfileSetupPage() {
   const router = useRouter();
   const supabase = createClientComponentClient();
 
+  const [authChecking, setAuthChecking] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,17 +44,71 @@ export default function ProfileSetupPage() {
   const [semester, setSemester] = useState('1');
 
   useEffect(() => {
+    let active = true;
+
     const checkAuthAndPrefill = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push('/auth');
+      // 1. Try getSession first
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        if (active) {
+          if (session.user.user_metadata?.full_name) {
+            setFullName(session.user.user_metadata.full_name);
+          }
+          setAuthChecking(false);
+        }
         return;
       }
-      if (user.user_metadata?.full_name) {
-        setFullName(user.user_metadata.full_name);
+
+      // 2. Try getUser fallback
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        if (active) {
+          if (user.user_metadata?.full_name) {
+            setFullName(user.user_metadata.full_name);
+          }
+          setAuthChecking(false);
+        }
+        return;
       }
+
+      // 3. Listen for incoming auth event (e.g. OAuth processing)
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
+        if (active) {
+          if (s?.user) {
+            if (s.user.user_metadata?.full_name) {
+              setFullName(s.user.user_metadata.full_name);
+            }
+            setAuthChecking(false);
+          } else if (event === 'SIGNED_OUT') {
+            router.push('/auth');
+          }
+        }
+      });
+
+      // Give it up to 2 seconds to settle before bouncing to /auth
+      const timeout = setTimeout(() => {
+        if (active && authChecking) {
+          supabase.auth.getSession().then(({ data: { session: s } }) => {
+            if (!s?.user && active) {
+              router.push('/auth');
+            } else if (s?.user && active) {
+              setAuthChecking(false);
+            }
+          });
+        }
+      }, 2000);
+
+      return () => {
+        subscription.unsubscribe();
+        clearTimeout(timeout);
+      };
     };
+
     checkAuthAndPrefill();
+
+    return () => {
+      active = false;
+    };
   }, [supabase, router]);
 
   // Sync default semester when year changes
@@ -89,28 +144,62 @@ export default function ProfileSetupPage() {
     setIsLoading(true);
 
     try {
-      await apiFetch('/api/profile', {
-        method: 'PUT',
-        body: JSON.stringify({
-          full_name: fullName.trim(),
-          register_no: registerNo.trim().toUpperCase(),
-          college: 'SRM Institute of Science and Technology',
-          campus: 'KTR',
-          degree,
-          branch,
-          year: parseInt(year) || 1,
-          semester: parseInt(semester) || 1,
-        }),
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('No authenticated user session found. Please sign in again.');
+      }
 
-      router.refresh();
-      router.push('/dashboard');
+      const profilePayload = {
+        id: user.id,
+        full_name: fullName.trim(),
+        register_no: registerNo.trim().toUpperCase(),
+        college: 'SRM Institute of Science and Technology',
+        campus: 'KTR',
+        degree,
+        branch,
+        year: parseInt(year) || 1,
+        semester: parseInt(semester) || 1,
+        is_complete: true,
+        updated_at: new Date().toISOString(),
+      };
+
+      // 1. Direct Supabase update
+      const { error: dbError } = await supabase
+        .from('profiles')
+        .upsert(profilePayload);
+
+      if (dbError) {
+        console.error('Direct profile upsert error:', dbError);
+      }
+
+      // 2. Best-effort sync with backend Express API
+      try {
+        await apiFetch('/api/profile', {
+          method: 'PUT',
+          body: JSON.stringify(profilePayload),
+        });
+      } catch (apiErr) {
+        console.warn('Backend profile sync non-fatal warning:', apiErr);
+      }
+
+      window.location.href = '/dashboard';
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred while setting up your profile.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3 text-text-muted">
+          <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm font-medium">Verifying your SRM account...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">

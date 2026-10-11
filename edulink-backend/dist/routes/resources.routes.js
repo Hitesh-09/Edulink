@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const resources_controller_1 = require("../controllers/resources.controller");
+const router = (0, express_1.Router)();
+router.get("/", resources_controller_1.getResources);
+router.post("/", resources_controller_1.postResource);
+router.get("/:id", resources_controller_1.getResource);
+router.post("/:id/upvote", resources_controller_1.upvoteResource);
+router.post("/:id/bookmark", resources_controller_1.bookmarkResource);
+router.post("/:id/download", resources_controller_1.downloadResource);
+exports.default = router;

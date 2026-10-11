@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const doubts_controller_1 = require("../controllers/doubts.controller");
+const router = (0, express_1.Router)();
+router.get("/", doubts_controller_1.getDoubts);
+router.post("/", doubts_controller_1.postDoubt);
+router.get("/:id", doubts_controller_1.getDoubt);
+router.post("/:id/answers", doubts_controller_1.postAnswer);
+router.post("/:id/upvote", doubts_controller_1.upvoteDoubt);
+router.post("/answers/:answerId/upvote", doubts_controller_1.upvoteAnswer);
+router.post("/answers/:answerId/accept", doubts_controller_1.acceptAnswerHandler);
+exports.default = router;
