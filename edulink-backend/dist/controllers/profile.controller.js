@@ -17,6 +17,7 @@ exports.getProfile = getProfile;
 const updateProfile = async (req, res, next) => {
     try {
         const userId = req.user?.id;
+        const userEmail = req.user?.email;
         if (!userId) {
             res.status(401).json({ error: "Unauthorized" });
             return;
@@ -40,7 +41,7 @@ const updateProfile = async (req, res, next) => {
             semester: calculatedSemester,
             avatar_url,
             interests,
-        });
+        }, userEmail);
         res.json(result);
     }
     catch (error) {

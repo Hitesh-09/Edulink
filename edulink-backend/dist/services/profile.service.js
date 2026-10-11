@@ -34,7 +34,27 @@ const getProfileById = async (userId) => {
 };
 exports.getProfileById = getProfileById;
 /** Upserts profile data and replaces interests for the given user ID. */
-const upsertOwnProfile = async (userId, payload) => {
+const upsertOwnProfile = async (userId, payload, userEmail) => {
+    // Defensive: ensure user exists in public.users to satisfy profiles_id_fkey
+    try {
+        let emailToUse = userEmail;
+        if (!emailToUse) {
+            const { data: authUserData } = await supabase_1.supabase.auth.admin.getUserById(userId);
+            emailToUse = authUserData?.user?.email;
+        }
+        if (emailToUse) {
+            const { error: userError } = await supabase_1.supabase.from("users").upsert({
+                id: userId,
+                email: emailToUse,
+            }, { onConflict: "id" });
+            if (userError) {
+                console.warn("[upsertOwnProfile] Defensive public.users upsert warning:", userError.message);
+            }
+        }
+    }
+    catch (err) {
+        console.warn("[upsertOwnProfile] Could not defensively upsert public.users:", err);
+    }
     const { interests, ...profileFields } = payload;
     const { error: upsertError } = await supabase_1.supabase.from("profiles").upsert({
         id: userId,

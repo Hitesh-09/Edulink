@@ -44,8 +44,33 @@ export const getProfileById = async (
 /** Upserts profile data and replaces interests for the given user ID. */
 export const upsertOwnProfile = async (
   userId: string,
-  payload: Omit<Profile, "id" | "is_complete"> & { interests?: string[] }
+  payload: Omit<Profile, "id" | "is_complete"> & { interests?: string[] },
+  userEmail?: string
 ): Promise<{ profile: Profile; interests: Interest[] }> => {
+  // Defensive: ensure user exists in public.users to satisfy profiles_id_fkey
+  try {
+    let emailToUse = userEmail;
+    if (!emailToUse) {
+      const { data: authUserData } = await supabase.auth.admin.getUserById(userId);
+      emailToUse = authUserData?.user?.email;
+    }
+
+    if (emailToUse) {
+      const { error: userError } = await supabase.from("users").upsert(
+        {
+          id: userId,
+          email: emailToUse,
+        },
+        { onConflict: "id" }
+      );
+      if (userError) {
+        console.warn("[upsertOwnProfile] Defensive public.users upsert warning:", userError.message);
+      }
+    }
+  } catch (err) {
+    console.warn("[upsertOwnProfile] Could not defensively upsert public.users:", err);
+  }
+
   const { interests, ...profileFields } = payload;
   const { error: upsertError } = await supabase.from("profiles").upsert({
     id: userId,

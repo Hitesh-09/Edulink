@@ -6,9 +6,16 @@
 -- 1. EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. PROFILES TABLE
+-- 2. USERS TABLE (Links Supabase auth.users to public schema)
+CREATE TABLE IF NOT EXISTS public.users (
+  id UUID NOT NULL PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 3. PROFILES TABLE
 CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  id UUID NOT NULL PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
   full_name TEXT NOT NULL DEFAULT '',
   register_no TEXT,
   college TEXT DEFAULT 'SRM Institute of Science and Technology',
@@ -125,11 +132,18 @@ CREATE TABLE IF NOT EXISTS public.direct_messages (
 );
 
 -- ==========================================================
--- AUTOMATIC PROFILE TRIGGER ON SIGNUP
+-- AUTOMATIC USER & PROFILE TRIGGER ON SIGNUP
 -- ==========================================================
-CREATE OR REPLACE FUNCTION public.handle_new_user()
+CREATE OR REPLACE FUNCTION public.handle_new_auth_user()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- 1. Insert into public.users first to satisfy foreign key constraints
+  INSERT INTO public.users (id, email, created_at)
+  VALUES (NEW.id, NEW.email, NEW.created_at)
+  ON CONFLICT (id) DO UPDATE
+    SET email = EXCLUDED.email;
+
+  -- 2. Insert stub profile into public.profiles
   INSERT INTO public.profiles (id, full_name, is_complete)
   VALUES (
     NEW.id,
@@ -137,6 +151,7 @@ BEGIN
     FALSE
   )
   ON CONFLICT (id) DO NOTHING;
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -144,11 +159,12 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_auth_user();
 
 -- ==========================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- ==========================================================
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.interests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profile_interests ENABLE ROW LEVEL SECURITY;
@@ -156,6 +172,13 @@ ALTER TABLE public.connection_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.connections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.study_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.session_participants ENABLE ROW LEVEL SECURITY;
+
+-- Users: Read for authenticated, insert/update own
+DROP POLICY IF EXISTS "Users read policy" ON public.users;
+CREATE POLICY "Users read policy" ON public.users FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Users update policy" ON public.users;
+CREATE POLICY "Users update policy" ON public.users FOR UPDATE TO authenticated USING (auth.uid() = id);
 ALTER TABLE public.study_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.session_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.direct_messages ENABLE ROW LEVEL SECURITY;
@@ -216,3 +239,16 @@ BEGIN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.direct_messages;
   END IF;
 END $$;
+
+-- ==========================================================
+-- BACKFILL EXISTING AUTH USERS INTO USERS & PROFILES
+-- ==========================================================
+INSERT INTO public.users (id, email, created_at)
+SELECT id, email, created_at FROM auth.users
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.profiles (id, full_name, is_complete)
+SELECT id, COALESCE(raw_user_meta_data->>'full_name', ''), FALSE
+FROM auth.users
+ON CONFLICT (id) DO NOTHING;
+

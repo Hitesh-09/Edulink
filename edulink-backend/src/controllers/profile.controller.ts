@@ -23,6 +23,7 @@ export const updateProfile = async (
 ): Promise<void> => {
   try {
     const userId = req.user?.id;
+    const userEmail = req.user?.email;
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
@@ -50,18 +51,22 @@ export const updateProfile = async (
 
     const calculatedSemester = semester ? Number(semester) : ((Number(year) - 1) * 2 + 1);
 
-    const result = await upsertOwnProfile(userId, {
-      full_name,
-      register_no: register_no ? String(register_no).trim().toUpperCase() : undefined,
-      college,
-      campus: campus || "KTR",
-      degree,
-      branch,
-      year: Number(year),
-      semester: calculatedSemester,
-      avatar_url,
-      interests,
-    });
+    const result = await upsertOwnProfile(
+      userId,
+      {
+        full_name,
+        register_no: register_no ? String(register_no).trim().toUpperCase() : undefined,
+        college,
+        campus: campus || "KTR",
+        degree,
+        branch,
+        year: Number(year),
+        semester: calculatedSemester,
+        avatar_url,
+        interests,
+      },
+      userEmail
+    );
 
     res.json(result);
   } catch (error) {
