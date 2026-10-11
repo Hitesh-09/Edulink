@@ -47,24 +47,44 @@ export default function ProfileSetupPage() {
     let active = true;
 
     const checkAuthAndPrefill = async () => {
+      let currentUser: any = null;
+
       // 1. Try getSession first
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        if (active) {
-          if (session.user.user_metadata?.full_name) {
-            setFullName(session.user.user_metadata.full_name);
-          }
-          setAuthChecking(false);
+        currentUser = session.user;
+      } else {
+        // 2. Try getUser fallback
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          currentUser = user;
         }
-        return;
       }
 
-      // 2. Try getUser fallback
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
+      if (currentUser && active) {
+        if (currentUser.user_metadata?.full_name) {
+          setFullName(currentUser.user_metadata.full_name);
+        }
+
+        // Check existing profile in Supabase
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', currentUser.id)
+          .maybeSingle();
+
         if (active) {
-          if (user.user_metadata?.full_name) {
-            setFullName(user.user_metadata.full_name);
+          if (existingProfile?.is_complete === true) {
+            window.location.replace('/dashboard');
+            return;
+          }
+          if (existingProfile) {
+            if (existingProfile.full_name) setFullName(existingProfile.full_name);
+            if (existingProfile.register_no) setRegisterNo(existingProfile.register_no);
+            if (existingProfile.degree) setDegree(existingProfile.degree);
+            if (existingProfile.branch) setBranch(existingProfile.branch);
+            if (existingProfile.year) setYear(String(existingProfile.year));
+            if (existingProfile.semester) setSemester(String(existingProfile.semester));
           }
           setAuthChecking(false);
         }
@@ -72,11 +92,21 @@ export default function ProfileSetupPage() {
       }
 
       // 3. Listen for incoming auth event (e.g. OAuth processing)
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, s) => {
         if (active) {
           if (s?.user) {
             if (s.user.user_metadata?.full_name) {
               setFullName(s.user.user_metadata.full_name);
+            }
+            const { data: existingProfile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', s.user.id)
+              .maybeSingle();
+
+            if (existingProfile?.is_complete === true) {
+              window.location.replace('/dashboard');
+              return;
             }
             setAuthChecking(false);
           } else if (event === 'SIGNED_OUT') {
@@ -140,19 +170,24 @@ export default function ProfileSetupPage() {
       return;
     }
 
+    const cleanedRegNo = registerNo.trim().toUpperCase();
+    if (cleanedRegNo.length < 5) {
+      setError('Please enter a valid SRM Register Number (e.g. RA2211003010000).');
+      return;
+    }
+
     setError(null);
     setIsLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error('No authenticated user session found. Please sign in again.');
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error('Your session has expired. Please sign in again.');
       }
 
       const profilePayload = {
-        id: user.id,
         full_name: fullName.trim(),
-        register_no: registerNo.trim().toUpperCase(),
+        register_no: cleanedRegNo,
         college: 'SRM Institute of Science and Technology',
         campus: 'KTR',
         degree,
@@ -163,29 +198,59 @@ export default function ProfileSetupPage() {
         updated_at: new Date().toISOString(),
       };
 
-      // 1. Direct Supabase update
-      const { error: dbError } = await supabase
+      // 1. Direct Supabase update (matches existing "Profiles update" RLS policy)
+      const { data: updatedRows, error: updateError } = await supabase
         .from('profiles')
-        .upsert(profilePayload);
+        .update(profilePayload)
+        .eq('id', user.id)
+        .select();
 
-      if (dbError) {
-        console.error('Direct profile upsert error:', dbError);
+      // 2. If update didn't match a row (e.g. auth trigger didn't run), fallback to upsert
+      if (updateError || !updatedRows || updatedRows.length === 0) {
+        console.warn('Profile update did not match row, attempting upsert fallback:', updateError?.message);
+        const { error: upsertError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: user.id,
+            ...profilePayload,
+          });
+
+        if (upsertError) {
+          console.error('Profile upsert error:', upsertError);
+          if (
+            upsertError.message.includes('profiles_register_no_key') ||
+            upsertError.message.includes('duplicate key')
+          ) {
+            throw new Error(`The Register Number "${cleanedRegNo}" is already in use by another account.`);
+          }
+          if (
+            upsertError.message.includes('row-level security') ||
+            upsertError.code === '42501'
+          ) {
+            throw new Error('Database permission error: Please ensure the Profiles insert policy is added in your Supabase SQL editor.');
+          }
+          throw new Error(upsertError.message || 'Failed to save your profile.');
+        }
       }
 
-      // 2. Best-effort sync with backend Express API
-      try {
-        await apiFetch('/api/profile', {
-          method: 'PUT',
-          body: JSON.stringify(profilePayload),
-        });
-      } catch (apiErr) {
-        console.warn('Backend profile sync non-fatal warning:', apiErr);
+      // 3. Best-effort sync with backend Express API if reachable and configured
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (apiUrl && !apiUrl.includes('localhost')) {
+        try {
+          await apiFetch('/api/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ id: user.id, ...profilePayload }),
+          });
+        } catch (apiErr) {
+          console.warn('Backend profile sync non-fatal warning:', apiErr);
+        }
       }
 
-      window.location.href = '/dashboard';
+      // 4. Force a hard redirect to /dashboard to re-verify session cleanly
+      window.location.replace('/dashboard');
     } catch (err: any) {
+      console.error('Profile setup submission error:', err);
       setError(err.message || 'An unexpected error occurred while setting up your profile.');
-    } finally {
       setIsLoading(false);
     }
   };

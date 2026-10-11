@@ -161,9 +161,10 @@ ALTER TABLE public.doubt_upvotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.answer_upvotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.direct_messages ENABLE ROW LEVEL SECURITY;
 
--- Profiles: Authenticated users can read profiles; owners can update
+-- Profiles: Authenticated users can read profiles; owners can insert and update
 CREATE POLICY "Profiles select" ON public.profiles FOR SELECT TO authenticated USING (true);
-CREATE POLICY "Profiles update" ON public.profiles FOR UPDATE TO authenticated USING (auth.uid() = id);
+CREATE POLICY "Profiles insert" ON public.profiles FOR INSERT TO authenticated WITH CHECK (auth.uid() = id);
+CREATE POLICY "Profiles update" ON public.profiles FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
 -- Resources
 CREATE POLICY "Resources select" ON public.resources FOR SELECT TO authenticated USING (true);
