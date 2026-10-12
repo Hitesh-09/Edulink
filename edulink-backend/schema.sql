@@ -204,3 +204,17 @@ CREATE POLICY "Public Resource Access" ON storage.objects FOR SELECT TO authenti
 
 DROP POLICY IF EXISTS "Authenticated Resource Upload" ON storage.objects;
 CREATE POLICY "Authenticated Resource Upload" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'resources');
+
+-- 12. STORAGE BUCKET FOR AVATARS
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatars', 'avatars', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Public Avatar Access" ON storage.objects;
+CREATE POLICY "Public Avatar Access" ON storage.objects FOR SELECT TO authenticated, anon USING (bucket_id = 'avatars');
+
+DROP POLICY IF EXISTS "Authenticated Avatar Upload" ON storage.objects;
+CREATE POLICY "Authenticated Avatar Upload" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'avatars');
+
+DROP POLICY IF EXISTS "Authenticated Avatar Update" ON storage.objects;
+CREATE POLICY "Authenticated Avatar Update" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'avatars');
