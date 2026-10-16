@@ -13,10 +13,7 @@ import {
   Sparkles,
   CheckCircle,
   FileText,
-  Play,
-  Mail,
-  Phone,
-  ExternalLink
+  Play
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -203,73 +200,9 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Let's Work Together Section */}
-      <section className="w-full py-24 sm:py-32 px-6 bg-[#141314]">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl sm:text-7xl md:text-8xl font-light tracking-tight text-white leading-[1.1] mb-2">
-            Let&apos;s work
-          </h2>
-          <h2 className="text-5xl sm:text-7xl md:text-8xl font-light tracking-tight text-stone-500 leading-[1.1] mb-10">
-            together
-          </h2>
-
-          {/* Arrow Circle Button */}
-          <a
-            href="mailto:hiteishshimpi@gmail.com"
-            className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-stone-700 hover:border-white text-stone-400 hover:text-white transition-all mb-16"
-          >
-            <ExternalLink size={22} />
-          </a>
-
-          {/* Description */}
-          <p className="text-lg sm:text-xl text-stone-400 max-w-xl mx-auto leading-relaxed mb-8">
-            Have a project in mind? I&apos;d love to hear about it. Let&apos;s create something exceptional together.
-          </p>
-
-          {/* Email */}
-          <a
-            href="mailto:hiteishshimpi@gmail.com"
-            className="flex items-center justify-center gap-2.5 text-lg sm:text-xl text-stone-300 hover:text-white transition-colors mb-3"
-          >
-            <Mail size={20} className="text-[#FF553E]" />
-            hiteishshimpi@gmail.com
-          </a>
-
-          {/* Phone */}
-          <a
-            href="tel:+919876543210"
-            className="flex items-center justify-center gap-2.5 text-lg sm:text-xl text-stone-300 hover:text-white transition-colors"
-          >
-            <Phone size={20} className="text-[#FF553E]" />
-            +91 98765 43210
-          </a>
-        </div>
-      </section>
-
       {/* Footer */}
-      <footer className="w-full border-t border-stone-800/80 py-10 px-6 bg-[#141314]">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          {/* Copyright */}
-          <p className="text-sm text-stone-500">
-            © {new Date().getFullYear()} EduLink — SRMIST KTR Academic Community Platform.
-          </p>
-
-          {/* Social Icons */}
-          <div className="flex items-center gap-5">
-            <a href="#" target="_blank" rel="noopener noreferrer" className="text-stone-500 hover:text-white transition-colors" aria-label="Instagram">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="text-stone-500 hover:text-white transition-colors" aria-label="LinkedIn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="text-stone-500 hover:text-white transition-colors" aria-label="Twitter / X">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="text-stone-500 hover:text-white transition-colors" aria-label="GitHub">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-            </a>
-          </div>
-        </div>
+      <footer className="w-full border-t border-stone-800/80 py-8 px-6 text-center text-xs text-stone-500">
+        <p>© {new Date().getFullYear()} EduLink — SRMIST KTR Academic Community Platform.</p>
       </footer>
     </div>
   );
